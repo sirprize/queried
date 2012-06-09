@@ -1,0 +1,17 @@
+{
+    "name": "sirprize/queried",
+    "type": "library",
+    "description": "Reusable query component builder",
+    "keywords": ["query", "sql", "dql"],
+    "homepage": "https://github.com/sirprize/queried",
+    "license": "MIT",
+    "authors": [
+        { "name": "Christian Hoegl", "email": "chrigu@sirprize.me" }
+    ],
+    "autoload": {
+        "psr-0": { "Sirprize\\Queried": "lib/" }
+    },
+    "require": {
+        "php": ">=5.3.2"
+    }
+}
