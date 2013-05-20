@@ -21,23 +21,32 @@ use Sirprize\Queried\Sorting\Sorting;
  
 abstract class AbstractQuery
 {
-    protected $active = array();
-    protected $available = array();
+    protected $registeredClauses = array();
+    protected $activeClauses = array();
     protected $tokenizer = null;
     protected $range = null;
     protected $sortingRules = array();
     protected $sortingParams = array();
 
-    public function __construct(array $config = array())
+    public function registerClauses(array $clauses)
     {
-        $this->setup();
-        
-        if(array_key_exists('activate', $config))
+        foreach($clauses as $name => $clause)
         {
-            foreach($config['activate'] as $name => $args)
-            {
-                $this->activateClause($name, $args);
-            }
+            $this->registerClause($name, $clause);
+        }
+    }
+
+    public function registerClause($name, $clause)
+    {
+        $this->registeredClauses[$name] = $clause;
+        return $this;
+    }
+
+    public function activateClauses(array $clauses)
+    {
+        foreach($clauses as $name => $args)
+        {
+            $this->activateClause($name, $args);
         }
     }
     
@@ -45,44 +54,44 @@ abstract class AbstractQuery
     {
         if(!$this->hasClause($name))
         {
-            throw new QueryException(sprintf('No clause class available for key: "%s"', $name));
+            throw new QueryException(sprintf('No clause class registered for key: "%s"', $name));
         }
         
-        if(is_callable($this->available[$name]))
+        if(is_callable($this->registeredClauses[$name]))
         {
-            $this->addClause($name, $this->available[$name]($args));
+            $this->activeClauses[$name] = $this->registeredClauses[$name]($args);
         }
         else {
-            $this->addClause($name, new $this->available[$name]($args));
+            $this->activeClauses[$name] = new $this->registeredClauses[$name]($args);
+
         }
         
         return $this;
     }
-    
-    public function addClause($name, ClauseInterface $clause)
-    {
-        $this->active[$name] = $clause;
-        return $this;
-    }
-    
+
     public function hasClause($name)
     {
-        return array_key_exists($name, $this->available) || array_key_exists($name, $this->active);
+        return array_key_exists($name, $this->registeredClauses) || array_key_exists($name, $this->activeClauses);
     }
     
     public function isActive($name)
     {
-        return array_key_exists($name, $this->active);
+        return array_key_exists($name, $this->activeClauses);
     }
-    
-    public function getClause($name)
+
+    public function getActiveClauses()
+    {
+        return $this->activeClauses;
+    }
+
+    public function getActiveClause($name)
     {
         if(!$this->isActive($name))
         {
-            throw new QueryException(sprintf('No active clause available for key: "%s"', $name));
+            throw new QueryException(sprintf('No active clause for key: "%s"', $name));
         }
         
-        return $this->active[$name];
+        return $this->activeClauses[$name];
     }
     
     public function getTokenizer()
@@ -142,7 +151,4 @@ abstract class AbstractQuery
         $sorting = new Sorting($this->getSortingRules(), $this->getSortingParams());
         return $sorting->getExpressions();
     }
-    
-    protected function setup()
-    {}
 }

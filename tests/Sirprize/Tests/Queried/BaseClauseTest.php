@@ -30,8 +30,8 @@ class BaseClauseTest extends \PHPUnit_Framework_TestCase
     
     public function testConstructorArgs()
     {
-        $constructorArgs = array('artist' => 'rebolledo', 'label' => 'comeme');
-        $clause = new BaseClause($constructorArgs);
+        $args = array('artist' => 'rebolledo', 'label' => 'comeme');
+        $clause = new BaseClause($args);
         $this->assertSame('rebolledo', $clause->getArg('artist'));
         $this->assertSame('comeme', $clause->getArg('label'));
         $this->assertArrayHasKey('artist', $clause->getArgs());

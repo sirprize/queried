@@ -10,7 +10,6 @@ namespace Sirprize\Queried\Doctrine\ORM;
 
 use Doctrine\ORM\QueryBuilder;
 use Sirprize\Queried\AbstractQuery;
-use Sirprize\Queried\BaseClause;
 
 /**
  * AbstractDoctrineQuery.
@@ -22,19 +21,13 @@ abstract class AbstractDoctrineQuery extends AbstractQuery
 {
     protected $queryBuilder = null;
     
-    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    public function __construct(QueryBuilder $queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
-        return $this;
     }
     
     public function getQueryBuilder()
     {
-        if(!$this->queryBuilder)
-        {
-            throw new \Exception(sprintf('Call setQueryBuilder() before "%s"', __METHOD__));
-        }
-        
         return $this->queryBuilder;
     }
     
@@ -56,64 +49,24 @@ abstract class AbstractDoctrineQuery extends AbstractQuery
         }
     }
     
-    public function buildFieldLikeValClause($field, $alias)
+    public function registerSimpleLikeClause($name, $field, $alias = '')
     {
-        return $this->buildFieldClause($field, $alias, 'like');
+        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
+        $this->registerClause($name, $factory->like($field, $alias));
+        return $this;
     }
-    
-    public function buildFieldIsValClause($field, $alias)
-    {
-        return $this->buildFieldClause($field, $alias, 'is');
-    }
-    
-    public function buildFieldIsNotValClause($field, $alias)
-    {
-        return $this->buildFieldClause($field, $alias, 'not');
-    }
-    
-    protected function buildFieldClause($field, $alias, $operation)
-    {
-        if(!preg_match('/(is|not|like)/', $operation))
-        {
-            throw new QueryException(sprintf('Invalid operation: "%s"', $operation));
-        }
-        
-        $tokenizer = $this->getTokenizer();
 
-        return function($args) use ($tokenizer, $field, $alias, $operation)
-        {
-            try {
-                $clause = new BaseClause($args);
-                $token = $tokenizer->make();
-                $alias .= ($alias) ? '.' : '';
-                
-                if($operation == 'is')
-                {
-                    $clause
-                        ->setClause("{$alias}$field = :$token")
-                        ->addParam($token, $clause->getArg('value'))
-                    ;
-                }
-                else if($operation == 'not')
-                {
-                    $clause
-                        ->setClause("{$alias}$field != :$token")
-                        ->addParam($token, $clause->getArg('value'))
-                    ;
-                }
-                else if($operation == 'like')
-                {
-                    $clause
-                        ->setClause("{$alias}$field LIKE :$token")
-                        ->addParam($token, '%'.$clause->getArg('value').'%')
-                    ;
-                }
+    public function registerSimpleIsClause($name, $field, $alias = '')
+    {
+        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
+        $this->registerClause($name, $factory->is($field, $alias));
+        return $this;
+    }
 
-                return $clause;
-            }
-            catch(\Exception $e) {
-                throw new QueryException(sprintf('Error on field "%s": %s', $field, $e->getMessage()));
-            }
-        };
+    public function registerSimpleNotClause($name, $field, $alias = '')
+    {
+        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
+        $this->registerClause($name, $factory->not($field, $alias));
+        return $this;
     }
 }

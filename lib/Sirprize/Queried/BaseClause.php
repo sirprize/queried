@@ -24,9 +24,18 @@ class BaseClause implements ClauseInterface
     protected $params = array();
     protected $types = array();
 
-    public function __construct(array $args = array())
+    public function __construct(array $args = array(), array $aliases = array(), array $types = array(), Tokenizer $tokenizer = null)
     {
-        $this->setArgs($args);
+        $this
+            ->setArgs($args)
+            ->setAliases($aliases)
+            ->setTypes($types)
+        ;
+
+        if ($tokenizer)
+        {
+            $this->setTokenizer($tokenizer);
+        }
     }
     
     public function setTokenizer(Tokenizer $tokenizer)
