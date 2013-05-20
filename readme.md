@@ -50,7 +50,9 @@ Parsing input, setting defaults and assembling a query can leave you writing a l
 
 Sorting is normally defined by two parameters: what to sort by and in which order. This is expressed by one or more field names, each with an order of either ascending or descending (eg `ORDER BY release.title ASC, release.date DESC`). The Sorting class maps rule names (eg from user input) to expressions while applying defaults in case of no input or invalid input (given a non-existing rule name) and makes sure that only valid expressions make it into the query.
 
+    use Sirprize\Queried\Sorting\Params;
     use Sirprize\Queried\Sorting\Rules;
+    use Sirprize\Queried\Sorting\Sorting;
 
     $rules = new Rules();
         
@@ -171,7 +173,7 @@ Here's an example of a query built for use with the Doctrine ORM
                 ->getQuery()
             ;
         }
-
+        
         protected function build()
         {
             if ($this->built) { return; }
@@ -197,7 +199,7 @@ Here's an example of a query built for use with the Doctrine ORM
         }
     }
 
-### Building the query
+### Running the query
 
     use Sirprize\Paginate\Input\PageInput; // see github.com/sirprize/paginate
     use Sirprize\Paginate\Input\PageRage; // see github.com/sirprize/paginate
