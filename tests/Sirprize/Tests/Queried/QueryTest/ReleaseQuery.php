@@ -25,7 +25,7 @@ class ReleaseQuery extends AbstractQuery
         $this->registerConditions(
             array(
                 'artist' => $artist, // inline condition
-                'label' => 'Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions\LabelCondition' // external condition
+                'label' => new LabelCondition() // external condition
             )
         );
     }

@@ -13,6 +13,7 @@ use Sirprize\Queried\Sorting\Params;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
 use Sirprize\Queried\Where\Tokenizer;
+use Sirprize\Queried\Where\ConditionInterface;
 
 /**
  * AbstractQuery.
@@ -55,20 +56,24 @@ abstract class AbstractQuery
         return $this;
     }
     
-    public function activateCondition($name, $values = array())
+    public function activateCondition($name, array $values = array())
     {
         if(!$this->hasCondition($name))
         {
             throw new QueryException(sprintf('No condition registered for key: "%s"', $name));
         }
         
-        if(is_callable($this->registeredConditions[$name]))
+        if($this->registeredConditions[$name] instanceof ConditionInterface)
+        {
+            $this->activeConditions[$name] = $this->registeredConditions[$name]->setValues($values);
+        }
+        else if(is_callable($this->registeredConditions[$name]))
         {
             $this->activeConditions[$name] = $this->registeredConditions[$name]($values);
         }
         else {
-            $this->activeConditions[$name] = new $this->registeredConditions[$name]($values);
-
+            $this->activeConditions[$name] = new $this->registeredConditions[$name];
+            $this->activeConditions[$name]->setValues($values);
         }
         
         return $this;

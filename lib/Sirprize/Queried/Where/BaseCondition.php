@@ -16,105 +16,10 @@ namespace Sirprize\Queried\Where;
  
 class BaseCondition implements ConditionInterface
 {
-
-    protected $tokenizer = null;
-    protected $values = array();
-    protected $aliases = array();
     protected $clause = '';
     protected $params = array();
     protected $types = array();
-
-    public function __construct(array $values = array(), array $aliases = array(), array $types = array(), Tokenizer $tokenizer = null)
-    {
-        $this
-            ->setValues($values)
-            ->setAliases($aliases)
-            ->setTypes($types)
-        ;
-
-        if ($tokenizer)
-        {
-            $this->setTokenizer($tokenizer);
-        }
-    }
-    
-    public function setTokenizer(Tokenizer $tokenizer)
-    {
-        $this->tokenizer = $tokenizer;
-        return $this;
-    }
-    
-    public function getTokenizer()
-    {
-        if(!$this->tokenizer)
-        {
-            throw new ConditionException(sprintf('Call setTokenizer() before %s', __METHOD__));
-        }
-        
-        return $this->tokenizer;
-    }
-    
-    public function setValues(array $values)
-    {
-        foreach($values as $name => $value)
-        {
-            $this->addValue($name, $value);
-        }
-
-        return $this;
-    }
-
-    public function addValue($name, $value)
-    {
-        $this->values[$name] = $value;
-        return $this;
-    }
-
-    public function getValues()
-    {
-        return $this->values;
-    }
-    
-    public function getValue($name)
-    {
-        if(!array_key_exists($name, $this->values))
-        {
-            throw new ConditionException(sprintf('Missing valueument: "%s"', $name));
-        }
-        
-        return $this->values[$name];
-    }
-    
-    public function setAliases(array $aliases)
-    {
-        foreach($aliases as $name => $value)
-        {
-            $this->addAlias($name, $value);
-        }
-
-        return $this;
-    }
-
-    public function addAlias($name, $value)
-    {
-        $this->aliases[$name] = $value;
-        return $this;
-    }
-
-    public function getAliases()
-    {
-        return $this->aliases;
-    }
-    
-    public function getAlias($name)
-    {
-        if(!array_key_exists($name, $this->aliases))
-        {
-            throw new ConditionException(sprintf('Missing alias: "%s"', $name));
-        }
-        
-        return $this->aliases[$name];
-    }
+    protected $values = array();
 
     public function setClause($clause)
     {
@@ -169,8 +74,39 @@ class BaseCondition implements ConditionInterface
         return $this->types;
     }
 
-    public function build()
+    public function build(Tokenizer $tokenizer = null)
     {
         return $this;
+    }
+
+    public function setValues(array $values)
+    {
+        foreach($values as $name => $value)
+        {
+            $this->addValue($name, $value);
+        }
+
+        return $this;
+    }
+
+    public function addValue($name, $value)
+    {
+        $this->values[$name] = $value;
+        return $this;
+    }
+
+    protected function getValues()
+    {
+        return $this->values;
+    }
+    
+    protected function getValue($name)
+    {
+        if(!array_key_exists($name, $this->values))
+        {
+            return null;
+        }
+        
+        return $this->values[$name];
     }
 }

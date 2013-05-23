@@ -11,7 +11,6 @@ require_once __DIR__ . '/../lib/Sirprize/Queried/Where/BaseCondition.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/Where/ConditionException.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/Where/Tokenizer.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/AbstractQuery.php';
-require_once __DIR__ . '/../lib/Sirprize/Queried/PaginatedQueryInterface.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/QueryException.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/Doctrine/ORM/AbstractDoctrineQuery.php';
 require_once __DIR__ . '/../lib/Sirprize/Queried/Doctrine/ORM/SimpleConditionClosureFactory.php';

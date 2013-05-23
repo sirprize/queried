@@ -16,7 +16,6 @@ namespace Sirprize\Queried\Where;
  
 class Tokenizer
 {
-
     protected $prefix = null;
     protected $count = 0;
 

@@ -16,13 +16,8 @@ namespace Sirprize\Queried\Where;
  
 interface ConditionInterface
 {
-    public function __construct(array $values = array(), array $aliases = array(), array $types = array());
-    #public function addValue($name, $value);
-    #public function setValues(array $values);
-    #public function addAlias($name, $value);
-    #public function setAliases(array $aliases);
     public function getClause();
     public function getParams();
     public function getTypes();
-    public function build();
+    public function build(Tokenizer $tokenizer = null);
 }

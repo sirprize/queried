@@ -15,18 +15,21 @@ Parsing input, setting defaults and assembling `SELECT` queries can leave you wr
 
     class ArtistCondition extends BaseCondition
     {
-        public function build()
-        {
-            // these must be set before calling build()
-            $releaseAlias  = $this->getAlias('release');
-            $artist = $this->getValue('artist');
+        protected $alias = null;
 
-            // run
+        public function __construct($alias = '')
+        {
+            $this->alias = $alias;
+        }
+
+        public function build(Tokenizer $tokenizer = null)
+        {
+            $artist = $this->getValue('artist');
             $token = $this->getTokenizer()->make();
-            $releaseAlias .= ($releaseAlias) ? '.' : '';
+            $alias = ($this->alias) ? $this->alias . '.' : $this->alias;
 
             $this
-                ->setClause("{$releaseAlias}artist LIKE :$token")
+                ->setClause("{$alias}artist LIKE :$token")
                 ->addParam($token, '%'.$artist.'%')
             ;
 
@@ -34,13 +37,11 @@ Parsing input, setting defaults and assembling `SELECT` queries can leave you wr
         }
     }
 
-    $artistCondition = new ArtistCondition();
+    $artistCondition = new ArtistCondition('release');
 
     $artistCondition
-        ->addAlias('release', 'release')
         ->addValue('artist', 'Rebolledo')
-        ->setTokenizer(new Tokenizer())
-        ->build()
+        ->build(new Tokenizer())
     ;
 
     $condition = $artistCondition->getClause(); // returns "release.artist LIKE :token0"
@@ -129,7 +130,7 @@ Here's an example of a query built for use with the Doctrine ORM
             parent::__construct($queryBuilder);
 
             // register the external condition we built earlier
-            $this->registerCondition('artist', 'ArtistCondition');
+            $this->registerCondition('artist', new ArtistCondition($this->releaseAlias));
 
             // register a simple inline condition
             $this->registerSimpleLikeCondition('label', 'label', $this->releaseAlias);
@@ -187,11 +188,12 @@ Here's an example of a query built for use with the Doctrine ORM
             
             foreach($this->getActiveConditions() as $condition)
             {
-                $condition
-                    ->addAlias('release', $this->releaseAlias)
-                    ->setTokenizer($this->getTokenizer())
-                    ->build()
-                ;
+                $condition->build($this->getTokenizer());
+                
+                if (!$condition->getClause())
+                {
+                    continue;
+                }
                 
                 $this->getQueryBuilder()
                     ->andWhere($condition->getClause())

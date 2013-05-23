@@ -53,29 +53,30 @@ class SimpleConditionClosureFactory
         return function($values) use ($tokenizer, $field, $alias, $operation)
         {
             try {
-                $condition = new BaseCondition($values);
+                $condition = new BaseCondition();
                 $token = $tokenizer->make();
                 $alias .= ($alias) ? '.' : '';
+                $value = (array_key_exists('value', $values)) ? $values['value'] : null;
                 
                 if($operation == 'is')
                 {
                     $condition
                         ->setClause("{$alias}$field = :$token")
-                        ->addParam($token, $condition->getValue('value'))
+                        ->addParam($token, $value)
                     ;
                 }
                 else if($operation == 'not')
                 {
                     $condition
                         ->setClause("{$alias}$field != :$token")
-                        ->addParam($token, $condition->getValue('value'))
+                        ->addParam($token, $value)
                     ;
                 }
                 else if($operation == 'like')
                 {
                     $condition
                         ->setClause("{$alias}$field LIKE :$token")
-                        ->addParam($token, '%'.$condition->getValue('value').'%')
+                        ->addParam($token, '%'.$value.'%')
                     ;
                 }
 
