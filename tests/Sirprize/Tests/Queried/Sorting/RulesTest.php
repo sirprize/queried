@@ -19,14 +19,14 @@ class RulesTest extends \PHPUnit_Framework_TestCase
         $this->rules = new Rules();
         
         $title = $this->rules->newRule()
-            ->addAscExpression('release.title', 'asc')
-            ->addDescExpression('release.title', 'desc')
+            ->addAscColumn('release.title', 'asc')
+            ->addDescColumn('release.title', 'desc')
             ->setDefaultOrder('asc')
         ;
         
         $date = $this->rules->newRule()
-            ->addAscExpression('release.date', 'asc')
-            ->addDescExpression('release.date', 'desc')
+            ->addAscColumn('release.date', 'asc')
+            ->addDescColumn('release.date', 'desc')
             ->setDefaultOrder('desc')
         ;
         
@@ -43,16 +43,16 @@ class RulesTest extends \PHPUnit_Framework_TestCase
     
     public function testRuleSetters()
     {
-        $this->assertArrayHasKey('release.title', $this->rules->findExpressions('title', 'asc'));
-        $this->assertArrayHasKey('release.date', $this->rules->findExpressions('date', 'asc'));
+        $this->assertArrayHasKey('release.title', $this->rules->findColumns('title', 'asc'));
+        $this->assertArrayHasKey('release.date', $this->rules->findColumns('date', 'asc'));
     }
     
     public function testDefaultOrder()
     {
-        $expressions = $this->rules->findExpressions('title', 'asdfasdfasdf');
+        $expressions = $this->rules->findColumns('title', 'asdfasdfasdf');
         $this->assertSame('asc', $expressions['release.title']);
         
-        $expressions = $this->rules->findExpressions('date', 'asdfasdfasdf');
+        $expressions = $this->rules->findColumns('date', 'asdfasdfasdf');
         $this->assertSame('desc', $expressions['release.date']);
     }
 }

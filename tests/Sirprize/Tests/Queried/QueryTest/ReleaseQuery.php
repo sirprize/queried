@@ -6,10 +6,10 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalClauses;
+namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
 
 use Sirprize\Queried\AbstractQuery;
-use Sirprize\Queried\BaseClause;
+use Sirprize\Queried\Where\BaseCondition;
 
 class ReleaseQuery extends AbstractQuery
 {
@@ -17,15 +17,15 @@ class ReleaseQuery extends AbstractQuery
     
     public function __construct()
     {
-        $artist = function($args)
+        $artist = function($values)
         {
-            return new BaseClause($args);
+            return new BaseCondition($values);
         };
         
-        $this->registerClauses(
+        $this->registerConditions(
             array(
-                'artist' => $artist, // inline clause
-                'label' => 'Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalClauses\LabelClause' // external clause
+                'artist' => $artist, // inline condition
+                'label' => 'Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions\LabelCondition' // external condition
             )
         );
     }

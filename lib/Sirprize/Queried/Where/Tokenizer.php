@@ -6,7 +6,7 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
 
-namespace Sirprize\Queried;
+namespace Sirprize\Queried\Where;
 
 /**
  * Tokenizer.

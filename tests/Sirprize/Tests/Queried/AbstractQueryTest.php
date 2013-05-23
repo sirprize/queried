@@ -8,7 +8,7 @@
  
 namespace Sirprize\Tests\Queried;
 
-use Sirprize\Queried\BaseClause;
+use Sirprize\Queried\Where\BaseCondition;
 
 class AbstractQueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,42 +24,31 @@ class AbstractQueryTest extends \PHPUnit_Framework_TestCase
         $this->query = null;
     }
     
+    public function testAddCondition()
+    {
+        $this->assertInstanceOf('Sirprize\Queried\AbstractQuery', $this->query->registerCondition('someCondition', new BaseCondition()));
+        $this->assertTrue($this->query->hasCondition('someCondition'));
+        $this->assertFalse($this->query->hasActiveCondition('someCondition'));
+    }
+
+    public function testActivateCondition()
+    {
+        $this->query->registerCondition('someCondition', new BaseCondition());
+        $this->query->activateCondition('someCondition');
+        $this->assertTrue($this->query->hasActiveCondition('someCondition'));
+    }
+
     /**
      * @expectedException Sirprize\Queried\QueryException
      */
-    public function testActivateNonExistingClause()
+    public function testActivateNonExistingCondition()
     {
-        $this->query->activateClause('asdfdsf');
-    }
-    
-    public function zzzztestAddClause()
-    {
-        $this->assertInstanceOf('Sirprize\Queried\AbstractQuery', $this->query->registerClause('someClause', new BaseClause()));
-        $this->assertTrue($this->query->hasClause('someClause'));
-        #$this->assertTrue($this->query->isActive('someClause'));
+        $this->query->activateCondition('asdfdsf');
     }
     
     public function testSetRange()
     {
         $range = $this->getMock('Sirprize\Paginate\Range\RangeInterface');
         $this->assertInstanceOf('Sirprize\Queried\AbstractQuery', $this->query->setRange($range));
-    }
-    
-    /**
-     * @expectedException Sirprize\Queried\QueryException
-     */
-    public function testGetRange()
-    {
-        $this->query->getRange();
-    }
-    
-    public function testGetTokenizer()
-    {
-        $this->assertInstanceOf('Sirprize\Queried\Tokenizer', $this->query->getTokenizer());
-    }
-    
-    public function testGetSortingRules()
-    {
-        $this->assertInstanceOf('Sirprize\Queried\Sorting\Rules', $this->query->getSortingRules());
     }
 }

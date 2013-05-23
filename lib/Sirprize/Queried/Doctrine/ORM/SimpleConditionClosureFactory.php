@@ -8,17 +8,16 @@
  
 namespace Sirprize\Queried\Doctrine\ORM;
 
-use Sirprize\Queried\Tokenizer;
-use Sirprize\Queried\BaseClause;
-use Sirprize\Queried\QueryException;
+use Sirprize\Queried\Where\Tokenizer;
+use Sirprize\Queried\Where\BaseCondition;
 
 /**
- * SimpleClauseClosureFactory.
+ * SimpleConditionClosureFactory.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-class SimpleClauseClosureFactory
+class SimpleConditionClosureFactory
 {
     protected $tokenizer = null;
     
@@ -29,61 +28,61 @@ class SimpleClauseClosureFactory
     
     public function like($field, $alias = '')
     {
-        return $this->getClauseClosure($field, $alias, 'like');
+        return $this->getConditionClosure($field, $alias, 'like');
     }
     
     public function is($field, $alias = '')
     {
-        return $this->getClauseClosure($field, $alias, 'is');
+        return $this->getConditionClosure($field, $alias, 'is');
     }
     
     public function not($field, $alias = '')
     {
-        return $this->getClauseClosure($field, $alias, 'not');
+        return $this->getConditionClosure($field, $alias, 'not');
     }
     
-    protected function getClauseClosure($field, $alias, $operation)
+    protected function getConditionClosure($field, $alias, $operation)
     {
         if(!preg_match('/(is|not|like)/', $operation))
         {
-            throw new QueryException(sprintf('Invalid operation: "%s"', $operation));
+            throw new FactoryException(sprintf('Invalid operation: "%s"', $operation));
         }
         
         $tokenizer = $this->tokenizer;
 
-        return function($args) use ($tokenizer, $field, $alias, $operation)
+        return function($values) use ($tokenizer, $field, $alias, $operation)
         {
             try {
-                $clause = new BaseClause($args);
+                $condition = new BaseCondition($values);
                 $token = $tokenizer->make();
                 $alias .= ($alias) ? '.' : '';
                 
                 if($operation == 'is')
                 {
-                    $clause
+                    $condition
                         ->setClause("{$alias}$field = :$token")
-                        ->addParam($token, $clause->getArg('value'))
+                        ->addParam($token, $condition->getValue('value'))
                     ;
                 }
                 else if($operation == 'not')
                 {
-                    $clause
+                    $condition
                         ->setClause("{$alias}$field != :$token")
-                        ->addParam($token, $clause->getArg('value'))
+                        ->addParam($token, $condition->getValue('value'))
                     ;
                 }
                 else if($operation == 'like')
                 {
-                    $clause
+                    $condition
                         ->setClause("{$alias}$field LIKE :$token")
-                        ->addParam($token, '%'.$clause->getArg('value').'%')
+                        ->addParam($token, '%'.$condition->getValue('value').'%')
                     ;
                 }
 
-                return $clause;
+                return $condition;
             }
             catch(\Exception $e) {
-                throw new QueryException(sprintf('Error on field "%s": %s', $field, $e->getMessage()));
+                throw new FactoryException(sprintf('Error on field "%s": %s', $field, $e->getMessage()));
             }
         };
     }

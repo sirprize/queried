@@ -29,7 +29,7 @@ class Rules
         return $this->rules;
     }
     
-    public function findExpressions($ruleName, $ruleOrder)
+    public function findColumns($ruleName, $ruleOrder)
     {
         if(array_key_exists($ruleName, $this->rules))
         {
@@ -40,10 +40,10 @@ class Rules
             
             if($ruleOrder == 'asc')
             {
-                return $this->rules[$ruleName]->getAscExpressions();
+                return $this->rules[$ruleName]->getAscColumns();
             }
             else {
-                return $this->rules[$ruleName]->getDescExpressions();
+                return $this->rules[$ruleName]->getDescColumns();
             }
         }
         

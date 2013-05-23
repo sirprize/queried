@@ -16,8 +16,8 @@ namespace Sirprize\Queried\Sorting;
  
 class Sorting
 {
-    protected $rules = array();
-    protected $params = array();
+    protected $rules = null;
+    protected $params = null;
     
     public function __construct(Rules $rules, Params $params)
     {
@@ -25,17 +25,17 @@ class Sorting
         $this->params = $params;
     }
     
-    public function getExpressions()
+    public function getColumns()
     {
         $rules = $this->rules;
         
-        $getSortingExpressions = function($params) use ($rules)
+        $getColumns = function($params) use ($rules)
         {
             $expressions = array();
             
             foreach($params as $rule => $direction)
             {
-                foreach($rules->findExpressions($rule, $direction) as $sort => $order)
+                foreach($rules->findColumns($rule, $direction) as $sort => $order)
                 {
                     $expressions[$sort] = $order;
                 }
@@ -44,11 +44,11 @@ class Sorting
             return $expressions;
         };
         
-        $expressions = $getSortingExpressions($this->params->get());
+        $expressions = $getColumns($this->params->get());
         
         if(!count($expressions))
         {
-            $expressions = $getSortingExpressions($this->params->getDefaults());
+            $expressions = $getColumns($this->params->getDefaults());
         }
         
         return $expressions;

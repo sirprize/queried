@@ -6,28 +6,28 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Queried;
+namespace Sirprize\Queried\Where;
 
 /**
- * BaseClause.
+ * BaseCondition.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-class BaseClause implements ClauseInterface
+class BaseCondition implements ConditionInterface
 {
 
     protected $tokenizer = null;
-    protected $args = array();
+    protected $values = array();
     protected $aliases = array();
     protected $clause = '';
     protected $params = array();
     protected $types = array();
 
-    public function __construct(array $args = array(), array $aliases = array(), array $types = array(), Tokenizer $tokenizer = null)
+    public function __construct(array $values = array(), array $aliases = array(), array $types = array(), Tokenizer $tokenizer = null)
     {
         $this
-            ->setArgs($args)
+            ->setValues($values)
             ->setAliases($aliases)
             ->setTypes($types)
         ;
@@ -48,41 +48,41 @@ class BaseClause implements ClauseInterface
     {
         if(!$this->tokenizer)
         {
-            throw new QueryException(sprintf('Call setTokenizer() before %s', __METHOD__));
+            throw new ConditionException(sprintf('Call setTokenizer() before %s', __METHOD__));
         }
         
         return $this->tokenizer;
     }
     
-    public function setArgs(array $args)
+    public function setValues(array $values)
     {
-        foreach($args as $name => $value)
+        foreach($values as $name => $value)
         {
-            $this->addArg($name, $value);
+            $this->addValue($name, $value);
         }
 
         return $this;
     }
 
-    public function addArg($name, $value)
+    public function addValue($name, $value)
     {
-        $this->args[$name] = $value;
+        $this->values[$name] = $value;
         return $this;
     }
 
-    public function getArgs()
+    public function getValues()
     {
-        return $this->args;
+        return $this->values;
     }
     
-    public function getArg($name)
+    public function getValue($name)
     {
-        if(!array_key_exists($name, $this->args))
+        if(!array_key_exists($name, $this->values))
         {
-            throw new QueryException(sprintf('Missing argument: "%s"', $name));
+            throw new ConditionException(sprintf('Missing valueument: "%s"', $name));
         }
         
-        return $this->args[$name];
+        return $this->values[$name];
     }
     
     public function setAliases(array $aliases)
@@ -110,7 +110,7 @@ class BaseClause implements ClauseInterface
     {
         if(!array_key_exists($name, $this->aliases))
         {
-            throw new QueryException(sprintf('Missing alias: "%s"', $name));
+            throw new ConditionException(sprintf('Missing alias: "%s"', $name));
         }
         
         return $this->aliases[$name];

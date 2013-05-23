@@ -4,22 +4,22 @@ Reusable query component builder
 
 ## Description
 
-Parsing input, setting defaults and assembling a query can leave you writing a lot of boilerplate code. Queried helps writing reusable bits and it makes it easy to apply input as well as defaults when executing the query. 
+Parsing input, setting defaults and assembling `SELECT` queries can leave you writing a lot of boilerplate code. Queried helps writing reusable conditions for `WHERE` and `ORDER BY` and it makes it easy to apply input as well as defaults when executing the query. Queried can be used with any database or ORM. 
 
 ## Usage
 
-### Creating a clause for use in a WHERE statement
+### Creating a condition for use in a WHERE statement
 
-    use Sirprize\Queried\BaseClause;
-    use Sirprize\Queried\Tokenizer;
+    use Sirprize\Queried\Where\BaseCondition;
+    use Sirprize\Queried\Where\Tokenizer;
 
-    class ArtistClause extends BaseClause
+    class ArtistCondition extends BaseCondition
     {
         public function build()
         {
             // these must be set before calling build()
             $releaseAlias  = $this->getAlias('release');
-            $artist = $this->getArg('artist');
+            $artist = $this->getValue('artist');
 
             // run
             $token = $this->getTokenizer()->make();
@@ -34,37 +34,39 @@ Parsing input, setting defaults and assembling a query can leave you writing a l
         }
     }
 
-    $artistClause = new ArtistClause();
+    $artistCondition = new ArtistCondition();
 
-    $artistClause
+    $artistCondition
         ->addAlias('release', 'release')
-        ->addArg('artist', 'Rebolledo')
+        ->addValue('artist', 'Rebolledo')
         ->setTokenizer(new Tokenizer())
         ->build()
     ;
 
-    $clause = $artistClause->getClause(); // returns "release.artist LIKE :token0"
-    $params = $artistClause->getParams(); // returns array('token0' => '%Rebolledo%')
+    $condition = $artistCondition->getClause(); // returns "release.artist LIKE :token0"
+    $params = $artistCondition->getParams(); // returns array('token0' => '%Rebolledo%')
 
 ### Defining sorting
 
-Sorting is normally defined by two parameters: what to sort by and in which order. This is expressed by one or more field names, each with an order of either ascending or descending (eg `ORDER BY release.title ASC, release.date DESC`). The Sorting class maps rule names (eg from user input) to expressions while applying defaults in case of no input or invalid input (given a non-existing rule name) and makes sure that only valid expressions make it into the query.
+Sorting is normally defined by two parameters: what to sort by and in which direction. This is expressed by one or more field names, each with an direction of either ascending or descending (eg `ORDER BY release.date DESC, release.title ASC`). The Sorting class maps rule names (eg from user input) to columns while applying defaults in case of no input or invalid input (given a non-existing rule name) and makes sure that only valid columns make it into the query.
 
     use Sirprize\Queried\Sorting\Params;
     use Sirprize\Queried\Sorting\Rules;
     use Sirprize\Queried\Sorting\Sorting;
 
+    // the rules container
     $rules = new Rules();
-        
+    
+    // add rules
     $title = $rules->newRule()
-        ->addAscExpression('release.title', 'asc')
-        ->addDescExpression('release.title', 'desc')
+        ->addAscColumn('release.title', 'asc')
+        ->addDescColumn('release.title', 'desc')
         ->setDefaultOrder('asc')
     ;
     
     $date = $rules->newRule()
-        ->addAscExpression('release.date', 'asc')
-        ->addDescExpression('release.date', 'desc')
+        ->addAscColumn('release.date', 'asc')
+        ->addDescColumn('release.date', 'desc')
         ->setDefaultOrder('desc')
     ;
     
@@ -76,39 +78,39 @@ Sorting is normally defined by two parameters: what to sort by and in which orde
     // no defaults, no parameters
     $params = new Params();
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array();
+    $columns = $sorting->getColumns(); // returns array();
 
     // single default
     $params = new Params();
     $params->addDefault('title', 'asc');
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array('release.title' => 'asc');
+    $columns = $sorting->getColumns(); // returns array('release.title' => 'asc');
 
     // multiple defaults
     $params = new Params();
     $params->addDefault('title', 'asc');
     $params->addDefault('date', 'asc');
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array('release.title' => 'asc', 'release.date' => 'asc');
+    $columns = $sorting->getColumns(); // returns array('release.title' => 'asc', 'release.date' => 'asc');
 
     // defaults and valid parameters
     $params = new Params();
     $params->add('date', 'asc');
     $params->addDefault('title', 'asc');
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array('release.date' => 'asc');
+    $columns = $sorting->getColumns(); // returns array('release.date' => 'asc');
 
     // no defaults and invalid parameters (non-existing rule name)
     $params = new Params();
     $params->add('xxx', 'asc');
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array();
+    $columns = $sorting->getColumns(); // returns array();
 
     // no defaults and invalid parameters (invalid ordering, valid orderings are "asc" or "desc")
     $params = new Params();
     $params->add('date', 'xxx');
     $sorting = new Sorting($rules, $params);
-    $expressions = $sorting->getExpressions(); // returns array('release.date' => 'desc');
+    $columns = $sorting->getColumns(); // returns array('release.date' => 'desc');
 
 
 ### Creating a query
@@ -126,22 +128,22 @@ Here's an example of a query built for use with the Doctrine ORM
         {
             parent::__construct($queryBuilder);
 
-            // register the external clause we built earlier
-            $this->registerClause('artist', 'ArtistClause');
+            // register the external condition we built earlier
+            $this->registerCondition('artist', 'ArtistCondition');
 
-            // register a simple inline clause
-            $this->registerSimpleLikeClause('label', 'label', $this->releaseAlias);
+            // register a simple inline condition
+            $this->registerSimpleLikeCondition('label', 'label', $this->releaseAlias);
             
             // define some sorting rules
             $title = $this->getSortingRules()->newRule()
-                ->addAscExpression($this->releaseAlias.'.title', 'asc')
-                ->addDescExpression($this->releaseAlias.'.title', 'desc')
+                ->addAscColumn($this->releaseAlias.'.title', 'asc')
+                ->addDescColumn($this->releaseAlias.'.title', 'desc')
                 ->setDefaultOrder('asc')
             ;
 
             $artist = $this->getSortingRules()->newRule()
-                ->addAscExpression($this->releaseAlias.'.artist', 'asc')
-                ->addDescExpression($this->releaseAlias.'.artist', 'desc')
+                ->addAscColumn($this->releaseAlias.'.artist', 'asc')
+                ->addDescColumn($this->releaseAlias.'.artist', 'desc')
                 ->setDefaultOrder('asc')
             ;
             
@@ -183,17 +185,17 @@ Here's an example of a query built for use with the Doctrine ORM
                 ->from('Model\Entity\Release', $this->releaseAlias)
             ;
             
-            foreach($this->getActiveClauses() as $clause)
+            foreach($this->getActiveConditions() as $condition)
             {
-                $clause
+                $condition
                     ->addAlias('release', $this->releaseAlias)
                     ->setTokenizer($this->getTokenizer())
                     ->build()
                 ;
                 
                 $this->getQueryBuilder()
-                    ->andWhere($clause->getClause())
-                    ->setParameters($clause->getParams(), $clause->getTypes())
+                    ->andWhere($condition->getClause())
+                    ->setParameters($condition->getParams(), $condition->getTypes())
                 ;
             }
         }
@@ -219,7 +221,7 @@ Here's an example of a query built for use with the Doctrine ORM
     $query = new ReleaseQuery($em->createQueryBuilder()); // $em = the Doctrine entity manager
 
     $query
-        ->activateClause('artist', array('artist' => $_GET['artist']))
+        ->activateCondition('artist', array('artist' => $_GET['artist']))
         ->setSortingParams($sortingParams)
         ->setRange($range)
     ;

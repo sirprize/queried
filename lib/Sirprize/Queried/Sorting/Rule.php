@@ -16,30 +16,30 @@ namespace Sirprize\Queried\Sorting;
  
 class Rule
 {
-    protected $ascExpressions = array();
-    protected $descExpressions = array();
+    protected $ascColumns = array();
+    protected $descColumns = array();
     protected $defaultOrder = null;
     
-    public function addAscExpression($sort, $order)
+    public function addAscColumn($column, $order)
     {
-        $this->ascExpressions[$sort] = $order;
+        $this->ascColumns[$column] = $order;
         return $this;
     }
     
-    public function getAscExpressions()
+    public function getAscColumns()
     {
-        return $this->ascExpressions;
+        return $this->ascColumns;
     }
     
-    public function addDescExpression($sort, $order)
+    public function addDescColumn($column, $order)
     {
-        $this->descExpressions[$sort] = $order;
+        $this->descColumns[$column] = $order;
         return $this;
     }
     
-    public function getDescExpressions()
+    public function getDescColumns()
     {
-        return $this->descExpressions;
+        return $this->descColumns;
     }
     
     public function setDefaultOrder($defaultOrder)

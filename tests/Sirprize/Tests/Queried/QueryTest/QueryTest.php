@@ -6,55 +6,55 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalClauses;
+namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testActivateSomeClausesByConfig()
+    public function testActivateSomeConditionsByConfig()
     {
         $query = new ReleaseQuery();
 
-        $query->activateClauses(
+        $query->activateConditions(
             array(
                 'artist' => array()
             )
         );
 
-        $this->assertTrue($query->hasClause('artist'));
-        $this->assertTrue($query->isActive('artist'));
-        $this->assertTrue($query->hasClause('label'));
-        $this->assertFalse($query->isActive('label'));
+        $this->assertTrue($query->hasCondition('artist'));
+        $this->assertTrue($query->hasActiveCondition('artist'));
+        $this->assertTrue($query->hasCondition('label'));
+        $this->assertFalse($query->hasActiveCondition('label'));
     }
     
-    public function testActivateAllClausesByConfig()
+    public function testActivateAllConditionsByConfig()
     {
         $query = new ReleaseQuery();
 
-        $query->activateClauses(
+        $query->activateConditions(
             array(
                 'artist' => array(),
                 'label' => array()
             )
         );
 
-        $this->assertTrue($query->hasClause('artist'));
-        $this->assertTrue($query->isActive('artist'));
-        $this->assertTrue($query->hasClause('label'));
-        $this->assertTrue($query->isActive('label'));
+        $this->assertTrue($query->hasCondition('artist'));
+        $this->assertTrue($query->hasActiveCondition('artist'));
+        $this->assertTrue($query->hasCondition('label'));
+        $this->assertTrue($query->hasActiveCondition('label'));
     }
     
-    public function testManualClauseActivation()
+    public function testManualConditionActivation()
     {
         $query = new ReleaseQuery();
 
         $query
-            ->activateClause('artist', array())
-            ->activateClause('label', array())
+            ->activateCondition('artist', array())
+            ->activateCondition('label', array())
         ;
 
-        $this->assertTrue($query->hasClause('artist'));
-        $this->assertTrue($query->isActive('artist'));
-        $this->assertTrue($query->hasClause('label'));
-        $this->assertTrue($query->isActive('label'));
+        $this->assertTrue($query->hasCondition('artist'));
+        $this->assertTrue($query->hasActiveCondition('artist'));
+        $this->assertTrue($query->hasCondition('label'));
+        $this->assertTrue($query->hasActiveCondition('label'));
     }
 }

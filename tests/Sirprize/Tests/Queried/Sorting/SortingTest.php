@@ -21,14 +21,14 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $this->rules = new Rules();
         
         $title = $this->rules->newRule()
-            ->addAscExpression('release.title', 'asc')
-            ->addDescExpression('release.title', 'desc')
+            ->addAscColumn('release.title', 'asc')
+            ->addDescColumn('release.title', 'desc')
             ->setDefaultOrder('asc')
         ;
         
         $date = $this->rules->newRule()
-            ->addAscExpression('release.date', 'asc')
-            ->addDescExpression('release.date', 'desc')
+            ->addAscColumn('release.date', 'asc')
+            ->addDescColumn('release.date', 'desc')
             ->setDefaultOrder('desc')
         ;
         
@@ -48,7 +48,7 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $params = new Params();
         $params->add('title', 'asc');
         $sorting = new Sorting($this->rules, $params);
-        $expressions = $sorting->getExpressions();
+        $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
         $this->assertSame(1, count($expressions));
@@ -60,7 +60,7 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $params->add('title', 'asc');
         $params->add('date', 'asc');
         $sorting = new Sorting($this->rules, $params);
-        $expressions = $sorting->getExpressions();
+        $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
         $this->assertArrayHasKey('release.date', $expressions);
@@ -71,7 +71,7 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $params = new Params();
         $params->addDefault('title', 'asc');
         $sorting = new Sorting($this->rules, $params);
-        $expressions = $sorting->getExpressions();
+        $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
     }
@@ -80,7 +80,7 @@ class SortingTest extends \PHPUnit_Framework_TestCase
     {
         $params = new Params();
         $sorting = new Sorting($this->rules, $params);
-        $expressions = $sorting->getExpressions();
+        $expressions = $sorting->getColumns();
         
         $this->assertSame(0, count($expressions));
     }

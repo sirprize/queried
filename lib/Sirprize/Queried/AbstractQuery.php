@@ -12,6 +12,7 @@ use Sirprize\Paginate\Range\RangeInterface;
 use Sirprize\Queried\Sorting\Params;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
+use Sirprize\Queried\Where\Tokenizer;
 
 /**
  * AbstractQuery.
@@ -21,80 +22,96 @@ use Sirprize\Queried\Sorting\Sorting;
  
 abstract class AbstractQuery
 {
-    protected $registeredClauses = array();
-    protected $activeClauses = array();
+    protected $registeredConditions = array();
+    protected $activeConditions = array();
     protected $tokenizer = null;
     protected $range = null;
     protected $sortingRules = array();
     protected $sortingParams = array();
 
-    public function registerClauses(array $clauses)
+    public function registerConditions(array $conditions)
     {
-        foreach($clauses as $name => $clause)
+        foreach($conditions as $name => $condition)
         {
-            $this->registerClause($name, $clause);
+            $this->registerCondition($name, $condition);
         }
-    }
 
-    public function registerClause($name, $clause)
-    {
-        $this->registeredClauses[$name] = $clause;
         return $this;
     }
 
-    public function activateClauses(array $clauses)
+    public function registerCondition($name, $condition)
     {
-        foreach($clauses as $name => $args)
+        $this->registeredConditions[$name] = $condition;
+        return $this;
+    }
+
+    public function activateConditions(array $conditions)
+    {
+        foreach($conditions as $name => $values)
         {
-            $this->activateClause($name, $args);
+            $this->activateCondition($name, $values);
         }
+
+        return $this;
     }
     
-    public function activateClause($name, $args = array())
+    public function activateCondition($name, $values = array())
     {
-        if(!$this->hasClause($name))
+        if(!$this->hasCondition($name))
         {
-            throw new QueryException(sprintf('No clause class registered for key: "%s"', $name));
+            throw new QueryException(sprintf('No condition registered for key: "%s"', $name));
         }
         
-        if(is_callable($this->registeredClauses[$name]))
+        if(is_callable($this->registeredConditions[$name]))
         {
-            $this->activeClauses[$name] = $this->registeredClauses[$name]($args);
+            $this->activeConditions[$name] = $this->registeredConditions[$name]($values);
         }
         else {
-            $this->activeClauses[$name] = new $this->registeredClauses[$name]($args);
+            $this->activeConditions[$name] = new $this->registeredConditions[$name]($values);
 
         }
         
         return $this;
     }
 
-    public function hasClause($name)
+    public function hasCondition($name)
     {
-        return array_key_exists($name, $this->registeredClauses) || array_key_exists($name, $this->activeClauses);
+        return array_key_exists($name, $this->registeredConditions) || array_key_exists($name, $this->activeConditions);
     }
     
-    public function isActive($name)
+    public function hasActiveCondition($name)
     {
-        return array_key_exists($name, $this->activeClauses);
+        return array_key_exists($name, $this->activeConditions);
     }
 
-    public function getActiveClauses()
+    public function setRange(RangeInterface $range)
     {
-        return $this->activeClauses;
+        $this->range = $range;
+        return $this;
+    }
+    
+    public function setSortingParams(Params $sortingParams)
+    {
+        $this->sortingParams = $sortingParams;
+        return $this;
     }
 
-    public function getActiveClause($name)
+    protected function getActiveConditions()
     {
-        if(!$this->isActive($name))
+        return $this->activeConditions;
+    }
+
+    protected function getActiveCondition($name)
+    {
+        if(!$this->hasActiveCondition($name))
         {
-            throw new QueryException(sprintf('No active clause for key: "%s"', $name));
+            throw new QueryException(sprintf('No active condition for key: "%s"', $name));
         }
         
-        return $this->activeClauses[$name];
+        return $this->activeConditions[$name];
     }
     
-    public function getTokenizer()
+    protected function getTokenizer()
     {
         if(!$this->tokenizer)
         {
@@ -104,39 +121,17 @@ abstract class AbstractQuery
         return $this->tokenizer;
     }
     
-    public function setRange(RangeInterface $range)
-    {
-        $this->range = $range;
-        return $this;
-    }
-    
-    public function getRange()
-    {
-        if(!$this->range)
-        {
-            throw new QueryException(sprintf('Call setRange() before "%s"', __METHOD__));
-        }
-        
-        return $this->range;
-    }
-    
-    public function setSortingParams(Params $sortingParams)
-    {
-        $this->sortingParams = $sortingParams;
-        return $this;
-    }
-    
-    public function getSortingParams()
+    protected function getSortingParams()
     {
         if(!$this->sortingParams)
         {
-            throw new QueryException(sprintf('Call setSortingParams() before "%s"', __METHOD__));
+            $this->sortingParams = new Params();
         }
         
         return $this->sortingParams;
     }
     
-    public function getSortingRules()
+    protected function getSortingRules()
     {
         if(!$this->sortingRules)
         {
@@ -146,9 +141,18 @@ abstract class AbstractQuery
         return $this->sortingRules;
     }
     
-    public function getSortingExpressions()
+    protected function getSorting()
     {
-        $sorting = new Sorting($this->getSortingRules(), $this->getSortingParams());
-        return $sorting->getExpressions();
+        return new Sorting($this->getSortingRules(), $this->getSortingParams());
+    }
+
+    protected function getRange()
+    {
+        if(!$this->range)
+        {
+            throw new QueryException(sprintf('Call setRange() before "%s"', __METHOD__));
+        }
+        
+        return $this->range;
     }
 }

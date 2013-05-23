@@ -17,17 +17,17 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         
         $rule
-            ->addAscExpression('release.title', 'asc')
-            ->addAscExpression('release.date', 'desc')
-            ->addDescExpression('release.title', 'desc')
-            ->addDescExpression('release.date', 'desc')
+            ->addAscColumn('release.title', 'asc')
+            ->addAscColumn('release.date', 'desc')
+            ->addDescColumn('release.title', 'desc')
+            ->addDescColumn('release.date', 'desc')
             ->setDefaultOrder('asc')
         ;
         
-        $this->assertArrayHasKey('release.title', $rule->getAscExpressions());
-        $this->assertArrayHasKey('release.date', $rule->getAscExpressions());
-        $this->assertArrayHasKey('release.title', $rule->getDescExpressions());
-        $this->assertArrayHasKey('release.date', $rule->getDescExpressions());
+        $this->assertArrayHasKey('release.title', $rule->getAscColumns());
+        $this->assertArrayHasKey('release.date', $rule->getAscColumns());
+        $this->assertArrayHasKey('release.title', $rule->getDescColumns());
+        $this->assertArrayHasKey('release.date', $rule->getDescColumns());
         $this->assertSame('asc', $rule->getDefaultOrder());
     }
 }

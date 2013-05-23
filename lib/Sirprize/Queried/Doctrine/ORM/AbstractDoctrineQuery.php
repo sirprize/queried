@@ -43,30 +43,27 @@ abstract class AbstractDoctrineQuery extends AbstractQuery
     
     public function applySorting()
     {
-        foreach($this->getSortingExpressions() as $sort => $order)
+        foreach($this->getSorting()->getColumns() as $column => $order)
         {
-            $this->getQueryBuilder()->addOrderBy($sort, $order);
+            $this->getQueryBuilder()->addOrderBy($column, $order);
         }
     }
     
-    public function registerSimpleLikeClause($name, $field, $alias = '')
+    public function registerSimpleLikeCondition($name, $field, $alias = '')
     {
-        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
-        $this->registerClause($name, $factory->like($field, $alias));
-        return $this;
+        $factory = new SimpleConditionClosureFactory($this->getTokenizer());
+        return $this->registerCondition($name, $factory->like($field, $alias));
     }
 
-    public function registerSimpleIsClause($name, $field, $alias = '')
+    public function registerSimpleIsCondition($name, $field, $alias = '')
     {
-        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
-        $this->registerClause($name, $factory->is($field, $alias));
-        return $this;
+        $factory = new SimpleConditionClosureFactory($this->getTokenizer());
+        return $this->registerCondition($name, $factory->is($field, $alias));
     }
 
-    public function registerSimpleNotClause($name, $field, $alias = '')
+    public function registerSimpleNotCondition($name, $field, $alias = '')
     {
-        $factory = new SimpleClauseClosureFactory($this->getTokenizer());
-        $this->registerClause($name, $factory->not($field, $alias));
-        return $this;
+        $factory = new SimpleConditionClosureFactory($this->getTokenizer());
+        return $this->registerCondition($name, $factory->not($field, $alias));
     }
 }
