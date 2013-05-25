@@ -1,7 +1,7 @@
 {
     "name": "sirprize/queried",
     "type": "library",
-    "description": "Reusable query component builder",
+    "description": "Database/ORM-agnostic query construction helper",
     "keywords": ["query", "sql", "dql"],
     "homepage": "https://github.com/sirprize/queried",
     "license": "MIT",
