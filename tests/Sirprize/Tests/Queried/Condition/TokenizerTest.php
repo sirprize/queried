@@ -6,9 +6,9 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\Where;
+namespace Sirprize\Tests\Queried\Condition;
 
-use Sirprize\Queried\Where\Tokenizer;
+use Sirprize\Queried\Condition\Tokenizer;
 
 class TokenizerTest extends \PHPUnit_Framework_TestCase
 {

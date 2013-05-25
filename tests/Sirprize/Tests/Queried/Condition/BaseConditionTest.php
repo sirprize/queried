@@ -6,25 +6,25 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\Where;
+namespace Sirprize\Tests\Queried\Condition;
 
-use Sirprize\Queried\Where\BaseCondition;
-use Sirprize\Queried\Where\Tokenizer;
+use Sirprize\Queried\Condition\BaseCondition;
+use Sirprize\Queried\Condition\Tokenizer;
 
 class BaseConditionTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetGetCondition()
     {
         $condition = new BaseCondition();
-        $this->assertInstanceOf('Sirprize\Queried\Where\BaseCondition', $condition->setClause('asdfsdfsdf'));
+        $this->assertInstanceOf('Sirprize\Queried\Condition\BaseCondition', $condition->setClause('asdfsdfsdf'));
         $this->assertSame('asdfsdfsdf', $condition->getClause());
     }
     
     public function testParams()
     {
         $condition = new BaseCondition();
-        $this->assertInstanceOf('Sirprize\Queried\Where\BaseCondition', $condition->setParams(array('artist' => 'rebolledo', 'label' => 'comeme')));
-        $this->assertInstanceOf('Sirprize\Queried\Where\BaseCondition', $condition->addParam('type', 'exclusive'));
+        $this->assertInstanceOf('Sirprize\Queried\Condition\BaseCondition', $condition->setParams(array('artist' => 'rebolledo', 'label' => 'comeme')));
+        $this->assertInstanceOf('Sirprize\Queried\Condition\BaseCondition', $condition->addParam('type', 'exclusive'));
         $this->assertArrayHasKey('artist', $condition->getParams());
         $this->assertArrayHasKey('type', $condition->getParams());
     }
@@ -32,8 +32,8 @@ class BaseConditionTest extends \PHPUnit_Framework_TestCase
     public function testTypes()
     {
         $condition = new BaseCondition();
-        $this->assertInstanceOf('Sirprize\Queried\Where\BaseCondition', $condition->setTypes(array('creation_date' => 'DateTime')));
-        $this->assertInstanceOf('Sirprize\Queried\Where\BaseCondition', $condition->addType('modification_date', 'DateTime'));
+        $this->assertInstanceOf('Sirprize\Queried\Condition\BaseCondition', $condition->setTypes(array('creation_date' => 'DateTime')));
+        $this->assertInstanceOf('Sirprize\Queried\Condition\BaseCondition', $condition->addType('modification_date', 'DateTime'));
         $this->assertArrayHasKey('creation_date', $condition->getTypes());
         $this->assertArrayHasKey('modification_date', $condition->getTypes());
     }

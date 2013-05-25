@@ -8,10 +8,10 @@
  
 namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
 
-use Sirprize\Queried\AbstractQuery;
-use Sirprize\Queried\Where\BaseCondition;
+use Sirprize\Queried\BaseQuery;
+use Sirprize\Queried\Condition\BaseCondition;
 
-class ReleaseQuery extends AbstractQuery
+class ReleaseQuery extends BaseQuery
 {
     protected $alias = 'release';
     

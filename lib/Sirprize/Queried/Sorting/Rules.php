@@ -17,16 +17,10 @@ namespace Sirprize\Queried\Sorting;
 class Rules
 {
     protected $rules = array();
-    
-    public function addRule($name, Rule $rule)
+
+    public function newRule($name)
     {
-        $this->rules[$name] = $rule;
-        return $this;
-    }
-    
-    public function getRules()
-    {
-        return $this->rules;
+        return $this->rules[$name] = new Rule();
     }
     
     public function findColumns($ruleName, $ruleOrder)
@@ -48,10 +42,5 @@ class Rules
         }
         
         return array();
-    }
-    
-    public function newRule()
-    {
-        return new Rule();
     }
 }

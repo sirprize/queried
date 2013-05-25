@@ -9,7 +9,7 @@
 namespace Sirprize\Queried\Doctrine\ORM;
 
 use Doctrine\ORM\QueryBuilder;
-use Sirprize\Queried\AbstractQuery;
+use Sirprize\Queried\BaseQuery;
 
 /**
  * AbstractDoctrineQuery.
@@ -17,7 +17,7 @@ use Sirprize\Queried\AbstractQuery;
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-abstract class AbstractDoctrineQuery extends AbstractQuery
+abstract class AbstractDoctrineQuery extends BaseQuery
 {
     protected $queryBuilder = null;
     

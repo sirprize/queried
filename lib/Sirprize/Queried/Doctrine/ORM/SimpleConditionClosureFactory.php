@@ -8,8 +8,8 @@
  
 namespace Sirprize\Queried\Doctrine\ORM;
 
-use Sirprize\Queried\Where\Tokenizer;
-use Sirprize\Queried\Where\BaseCondition;
+use Sirprize\Queried\Condition\Tokenizer;
+use Sirprize\Queried\Condition\BaseCondition;
 
 /**
  * SimpleConditionClosureFactory.

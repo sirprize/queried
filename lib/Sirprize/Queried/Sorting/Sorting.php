@@ -17,23 +17,23 @@ namespace Sirprize\Queried\Sorting;
 class Sorting
 {
     protected $rules = null;
-    protected $params = null;
+    protected $input = null;
     
-    public function __construct(Rules $rules, Params $params)
+    public function __construct(Rules $rules, Input $input)
     {
         $this->rules = $rules;
-        $this->params = $params;
+        $this->input = $input;
     }
     
     public function getColumns()
     {
         $rules = $this->rules;
         
-        $getColumns = function($params) use ($rules)
+        $getColumns = function($input) use ($rules)
         {
             $expressions = array();
             
-            foreach($params as $rule => $direction)
+            foreach($input as $rule => $direction)
             {
                 foreach($rules->findColumns($rule, $direction) as $sort => $order)
                 {
@@ -44,11 +44,11 @@ class Sorting
             return $expressions;
         };
         
-        $expressions = $getColumns($this->params->get());
+        $expressions = $getColumns($this->input->get());
         
         if(!count($expressions))
         {
-            $expressions = $getColumns($this->params->getDefaults());
+            $expressions = $getColumns($this->input->getDefaults());
         }
         
         return $expressions;

@@ -9,26 +9,26 @@
 namespace Sirprize\Queried;
 
 use Sirprize\Paginate\Range\RangeInterface;
-use Sirprize\Queried\Sorting\Params;
+use Sirprize\Queried\Sorting\Input;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
-use Sirprize\Queried\Where\Tokenizer;
-use Sirprize\Queried\Where\ConditionInterface;
+use Sirprize\Queried\Condition\Tokenizer;
+use Sirprize\Queried\Condition\ConditionInterface;
 
 /**
- * AbstractQuery.
+ * BaseQuery.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-abstract class AbstractQuery
+class BaseQuery
 {
     protected $registeredConditions = array();
     protected $activeConditions = array();
     protected $tokenizer = null;
     protected $range = null;
     protected $sortingRules = array();
-    protected $sortingParams = array();
+    protected $sortingInput = array();
 
     public function registerConditions(array $conditions)
     {
@@ -95,13 +95,13 @@ abstract class AbstractQuery
         return $this;
     }
     
-    public function setSortingParams(Params $sortingParams)
+    public function setSortingInput(Input $sortingInput)
     {
-        $this->sortingParams = $sortingParams;
+        $this->sortingInput = $sortingInput;
         return $this;
     }
 
-    protected function getActiveConditions()
+    public function getActiveConditions()
     {
         return $this->activeConditions;
     }
@@ -126,14 +126,14 @@ abstract class AbstractQuery
         return $this->tokenizer;
     }
     
-    protected function getSortingParams()
+    protected function getSortingInput()
     {
-        if(!$this->sortingParams)
+        if(!$this->sortingInput)
         {
-            $this->sortingParams = new Params();
+            $this->sortingInput = new Input();
         }
         
-        return $this->sortingParams;
+        return $this->sortingInput;
     }
     
     protected function getSortingRules()
@@ -148,7 +148,7 @@ abstract class AbstractQuery
     
     protected function getSorting()
     {
-        return new Sorting($this->getSortingRules(), $this->getSortingParams());
+        return new Sorting($this->getSortingRules(), $this->getSortingInput());
     }
 
     protected function getRange()

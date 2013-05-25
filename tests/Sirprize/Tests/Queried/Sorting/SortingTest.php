@@ -9,7 +9,7 @@
 namespace Sirprize\Tests\Queried\Sorting;
 
 use Sirprize\Queried\Sorting\Rules;
-use Sirprize\Queried\Sorting\Params;
+use Sirprize\Queried\Sorting\Input;
 use Sirprize\Queried\Sorting\Sorting;
 
 class SortingTest extends \PHPUnit_Framework_TestCase
@@ -20,21 +20,16 @@ class SortingTest extends \PHPUnit_Framework_TestCase
     {
         $this->rules = new Rules();
         
-        $title = $this->rules->newRule()
+        $this->rules->newRule('title')
             ->addAscColumn('release.title', 'asc')
             ->addDescColumn('release.title', 'desc')
             ->setDefaultOrder('asc')
         ;
         
-        $date = $this->rules->newRule()
+        $this->rules->newRule('date')
             ->addAscColumn('release.date', 'asc')
             ->addDescColumn('release.date', 'desc')
             ->setDefaultOrder('desc')
-        ;
-        
-        $this->rules
-            ->addRule('title', $title)
-            ->addRule('date', $date)
         ;
     }
     
@@ -43,43 +38,43 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $this->rules = null;
     }
     
-    public function testParamsToRules()
+    public function testInputToRules()
     {
-        $params = new Params();
-        $params->add('title', 'asc');
-        $sorting = new Sorting($this->rules, $params);
+        $input = new Input();
+        $input->add('title', 'asc');
+        $sorting = new Sorting($this->rules, $input);
         $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
         $this->assertSame(1, count($expressions));
     }
     
-    public function testNestedSortingParams()
+    public function testNestedSortingInput()
     {
-        $params = new Params();
-        $params->add('title', 'asc');
-        $params->add('date', 'asc');
-        $sorting = new Sorting($this->rules, $params);
+        $input = new Input();
+        $input->add('title', 'asc');
+        $input->add('date', 'asc');
+        $sorting = new Sorting($this->rules, $input);
         $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
         $this->assertArrayHasKey('release.date', $expressions);
     }
     
-    public function testNoParamsWithDefault()
+    public function testNoInputWithDefault()
     {
-        $params = new Params();
-        $params->addDefault('title', 'asc');
-        $sorting = new Sorting($this->rules, $params);
+        $input = new Input();
+        $input->addDefault('title', 'asc');
+        $sorting = new Sorting($this->rules, $input);
         $expressions = $sorting->getColumns();
         
         $this->assertArrayHasKey('release.title', $expressions);
     }
     
-    public function testNoParamsNoDefault()
+    public function testNoInputNoDefault()
     {
-        $params = new Params();
-        $sorting = new Sorting($this->rules, $params);
+        $input = new Input();
+        $sorting = new Sorting($this->rules, $input);
         $expressions = $sorting->getColumns();
         
         $this->assertSame(0, count($expressions));

@@ -9,26 +9,26 @@
 namespace Sirprize\Queried\Sorting;
 
 /**
- * Params.
+ * Input.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
-class Params
+class Input
 {
-    protected $params = array();
+    protected $input = array();
     protected $defaults = array();
     
-    public function __construct(array $params = array(), array $defaults = array())
+    public function __construct(array $input = array(), array $defaults = array())
     {
-        $this->set($params);
+        $this->set($input);
         $this->setDefaults($defaults);
     }
     
-    public function set(array $params)
+    public function set(array $input)
     {
-        $this->params = array();
+        $this->input = array();
         
-        foreach($params as $sort => $order)
+        foreach($input as $sort => $order)
         {
             $this->add($sort, $order);
         }
@@ -38,13 +38,13 @@ class Params
     
     public function add($sort, $order)
     {
-        $this->params[$sort] = $order;
+        $this->input[$sort] = $order;
         return $this;
     }
     
     public function get()
     {
-        return $this->params;
+        return $this->input;
     }
     
     public function setDefaults(array $defaults)

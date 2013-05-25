@@ -8,7 +8,7 @@
  
 namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
 
-use Sirprize\Queried\Where\BaseCondition;
+use Sirprize\Queried\Condition\BaseCondition;
 
 class LabelCondition extends BaseCondition
 {}

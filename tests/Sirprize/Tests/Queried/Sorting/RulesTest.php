@@ -18,21 +18,16 @@ class RulesTest extends \PHPUnit_Framework_TestCase
     {
         $this->rules = new Rules();
         
-        $title = $this->rules->newRule()
+        $this->rules->newRule('title')
             ->addAscColumn('release.title', 'asc')
             ->addDescColumn('release.title', 'desc')
             ->setDefaultOrder('asc')
         ;
         
-        $date = $this->rules->newRule()
+        $this->rules->newRule('date')
             ->addAscColumn('release.date', 'asc')
             ->addDescColumn('release.date', 'desc')
             ->setDefaultOrder('desc')
-        ;
-        
-        $this->rules
-            ->addRule('title', $title)
-            ->addRule('date', $date)
         ;
     }
     
