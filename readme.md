@@ -204,6 +204,8 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     class ReleaseQuery extends AbstractDoctrineQuery
     {
         protected $releaseAlias = 'release';
+        protected $fromApplied = false;
+        protected $conditionsApplied = false;
         
         public function __construct(QueryBuilder $queryBuilder)
         {
@@ -236,38 +238,53 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
         
         public function getCountQuery()
         {
-            $this->setFrom();
+            $this->applyFrom();
             $this->applyConditions();
             
             return $this->getQueryBuilder()
+                ->resetDQLPart('select')
                 ->select("COUNT({$this->releaseAlias}.id)")
                 ->getQuery()
             ;
         }
         
-        public function getFullQuery($totalItems)
+        public function getPaginatedQuery($totalItems)
         {
-            $this->setFrom();
+            $this->applyFrom();
             $this->applyConditions();
             $this->applyRange($totalItems);
             $this->applySorting();
             
             return $this->getQueryBuilder()
+                ->resetDQLPart('select')
                 ->select($this->releaseAlias)
                 ->getQuery()
             ;
         }
 
-        protected function setFrom()
+        protected function applyFrom()
         {
+            if ($this->fromApplied)
+            {
+                return;
+            }
+
+            $this->fromApplied = true;
+
             $this->getQueryBuilder()
-                ->resetDQLParts()
                 ->from('My\Model\Entity\Product', $this->releaseAlias)
             ;
         }
 
         protected function applyConditions()
         {
+            if ($this->conditionsApplied)
+            {
+                return;
+            }
+
+            $this->conditionsApplied = true;
+
             foreach($this->getActiveConditions() as $condition)
             {
                 $condition->build($this->getTokenizer());
@@ -277,10 +294,12 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
                     continue;
                 }
 
-                $this->getQueryBuilder()
-                    ->andWhere($condition->getClause())
-                    ->setParameters($condition->getParams(), $condition->getTypes())
-                ;
+                $this->getQueryBuilder()->andWhere($condition->getClause());
+
+                foreach($condition->getParams() as $name => $value)
+                {
+                    $this->getQueryBuilder()->setParameter($name, $value, $condition->getType($name));
+                }
             }
         }
     }
