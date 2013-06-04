@@ -74,6 +74,16 @@ class BaseCondition implements ConditionInterface
         return $this->types;
     }
 
+    public function getType($name)
+    {
+        if(!array_key_exists($name, $this->types))
+        {
+            return null;
+        }
+        
+        return $this->types[$name];
+    }
+
     public function build(Tokenizer $tokenizer = null)
     {
         return $this;
