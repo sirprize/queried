@@ -94,6 +94,16 @@ class BaseQuery
         $this->range = $range;
         return $this;
     }
+
+    public function getRange()
+    {
+        if(!$this->range)
+        {
+            throw new QueryException(sprintf('Call setRange() before "%s"', __METHOD__));
+        }
+        
+        return $this->range;
+    }
     
     public function setSortingInput(Input $sortingInput)
     {
@@ -149,15 +159,5 @@ class BaseQuery
     protected function getSorting()
     {
         return new Sorting($this->getSortingRules(), $this->getSortingInput());
-    }
-
-    protected function getRange()
-    {
-        if(!$this->range)
-        {
-            throw new QueryException(sprintf('Call setRange() before "%s"', __METHOD__));
-        }
-        
-        return $this->range;
     }
 }
