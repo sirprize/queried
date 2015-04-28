@@ -33,6 +33,11 @@ abstract class AbstractDoctrineQuery extends BaseQuery
     
     public function applyRange($totalItems)
     {
+        if (!$this->getRange())
+        {
+            return;
+        }
+
         $this->getRange()->setTotalItems($totalItems);
         
         $this->getQueryBuilder()

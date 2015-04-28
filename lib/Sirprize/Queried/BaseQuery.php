@@ -97,11 +97,6 @@ class BaseQuery
 
     public function getRange()
     {
-        if(!$this->range)
-        {
-            throw new QueryException(sprintf('Call setRange() before "%s"', __METHOD__));
-        }
-        
         return $this->range;
     }
     
