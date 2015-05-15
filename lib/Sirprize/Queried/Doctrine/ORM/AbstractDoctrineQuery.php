@@ -14,6 +14,7 @@ use Sirprize\Queried\BaseQuery;
 /**
  * AbstractDoctrineQuery.
  *
+ * @deprecated
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
