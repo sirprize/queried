@@ -131,7 +131,7 @@ Sorting is normally expressed by one or more field names, each with a direction 
 
 The Sorting class maps rule names (eg from user input) to rules while applying defaults, given a non-existing rule name. It makes sure that only valid column definitions make it into the query. Let's put it all together:
 
-    use Sirprize\Queried\Sorting\Input;
+    use Sirprize\Queried\Sorting\Params;
     use Sirprize\Queried\Sorting\Rules;
     use Sirprize\Queried\Sorting\Sorting;
 
