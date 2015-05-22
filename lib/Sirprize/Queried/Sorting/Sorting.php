@@ -17,23 +17,72 @@ namespace Sirprize\Queried\Sorting;
 class Sorting
 {
     protected $rules = null;
-    protected $input = null;
-    
-    public function __construct(Rules $rules, Input $input)
+    protected $params = null;
+    protected $defaults = null;
+
+    public function setRules(Rules $rules)
     {
         $this->rules = $rules;
-        $this->input = $input;
+        return $this;
     }
-    
+
+    public function getRules()
+    {
+        if (!$this->rules)
+        {
+            $this->rules = new Rules();
+        }
+
+        return $this->rules;
+    }
+
+    public function setParams(Params $params)
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    public function getParams()
+    {
+        if (!$this->params)
+        {
+            $this->params = new Params();
+        }
+
+        return $this->params;
+    }
+
+    public function setDefaults(Params $defaults)
+    {
+        $this->defaults = $defaults;
+        return $this;
+    }
+
+    public function getDefaults()
+    {
+        if (!$this->defaults)
+        {
+            $this->defaults = new Params();
+        }
+
+        return $this->defaults;
+    }
+
     public function getColumns()
     {
+        if (!$this->rules)
+        {
+            return array();
+        }
+
+        $expressions = array();
         $rules = $this->rules;
-        
-        $getColumns = function($input) use ($rules)
+
+        $getColumns = function($params) use ($rules)
         {
             $expressions = array();
             
-            foreach($input as $rule => $direction)
+            foreach($params as $rule => $direction)
             {
                 foreach($rules->findColumns($rule, $direction) as $sort => $order)
                 {
@@ -44,11 +93,14 @@ class Sorting
             return $expressions;
         };
         
-        $expressions = $getColumns($this->input->get());
-        
-        if(!count($expressions))
+        if ($this->params)
         {
-            $expressions = $getColumns($this->input->getDefaults());
+            $expressions = $getColumns($this->params->get());
+        }
+
+        if(!count($expressions) && $this->defaults)
+        {
+            $expressions = $getColumns($this->defaults->get());
         }
         
         return $expressions;

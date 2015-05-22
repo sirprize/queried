@@ -9,13 +9,13 @@
 namespace Sirprize\Tests\Queried\Doctrine\ORM;
 
 use Sirprize\Queried\Condition\Tokenizer;
-use Sirprize\Queried\Doctrine\ORM\SimpleConditionClosureFactory;
+use Sirprize\Queried\Doctrine\ORM\SimpleConditionFactory;
 
 class ConditionBuilderTest extends \PHPUnit_Framework_TestCase
 {   
     public function testLikeCondition()
     {
-        $conditionFactory = new SimpleConditionClosureFactory(new Tokenizer());
+        $conditionFactory = new SimpleConditionFactory(new Tokenizer());
         $conditionClosure = $conditionFactory->like('artist', 'release');
         $condition = $conditionClosure(array('value' => 'Rebolledo'));
         
@@ -25,7 +25,7 @@ class ConditionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCondition()
     {
-        $conditionFactory = new SimpleConditionClosureFactory(new Tokenizer());
+        $conditionFactory = new SimpleConditionFactory(new Tokenizer());
         $conditionClosure = $conditionFactory->is('artist', 'release');
         $condition = $conditionClosure(array('value' => 'Rebolledo'));
         
@@ -35,7 +35,7 @@ class ConditionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotCondition()
     {
-        $conditionFactory = new SimpleConditionClosureFactory(new Tokenizer());
+        $conditionFactory = new SimpleConditionFactory(new Tokenizer());
         $conditionClosure = $conditionFactory->not('artist', 'release');
         $condition = $conditionClosure(array('value' => 'Rebolledo'));
         

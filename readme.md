@@ -40,7 +40,8 @@ Then the user can choose from digital or physical releases by setting the `forma
 
     $format = (array_key_exists('format', $_GET)) ? $_GET['format'] : null;
 
-    if ($format === 'digital') {
+    if ($format === 'digital')
+    {
         $query->activateCondition('digital');
     }
     else {
@@ -150,58 +151,72 @@ The Sorting class maps rule names (eg from user input) to rules while applying d
 
 No defaults, no parameters
 
-    $input = new Input();
-    $sorting = new Sorting($rules, $input);
+    $params = new Params();
+    $sorting = new Sorting();
+    $sorting->setRules($rules);
+    $sorting->setParams($params);
     $columns = $sorting->getColumns(); // array();
 
 Single default
 
-    $input = new Input();
-    $input->addDefault('title', 'asc');
-    $sorting = new Sorting($rules, $input);
+    $defaults = new Params();
+    $defaults->add('title', 'asc');
+    $sorting = new Sorting();
+    $sorting->setRules($rules);
+    $sorting->setDefaults($defaults);
     $columns = $sorting->getColumns(); // array('release.title' => 'asc');
 
 Multiple defaults
 
-    $input = new Input();
-    $input->addDefault('title', 'asc');
-    $input->addDefault('date', 'asc');
-    $sorting = new Sorting($rules, $input);
+    $defaults = new Params();
+    $defaults->add('title', 'asc');
+    $defaults->add('date', 'asc');
+    $sorting = new Sorting();
+    sorting->setRules($rules);
+    $sorting->setDefaults($defaults);
     $columns = $sorting->getColumns(); // array('release.title' => 'asc', 'release.date' => 'asc');
 
 Defaults and valid parameters
 
-    $input = new Input();
-    $input->add('date', 'asc');
-    $input->addDefault('title', 'asc');
-    $sorting = new Sorting($rules, $input);
+    $params = new Params();
+    $params->add('date', 'asc');
+    $defaults = new Params();
+    $defaults->add('title', 'asc');
+    $sorting = new Sorting();
+    $sorting->setRules($rules);
+    $sorting->setParams($params);
+    $sorting->setDefaults($defaults);
     $columns = $sorting->getColumns(); // array('release.date' => 'asc');
 
 No defaults and invalid parameters (non-existing rule name)
 
-    $input = new Input();
-    $input->add('xxx', 'asc');
-    $sorting = new Sorting($rules, $input);
+    $params = new Params();
+    $params->add('xxx', 'asc');
+    $sorting = new Sorting();
+    $sorting->setRules($rules);
+    $sorting->setParams($params);
     $columns = $sorting->getColumns(); // array();
 
 No defaults and invalid parameters (invalid ordering, valid orderings are "asc" or "desc")
 
-    $input = new Input();
-    $input->add('date', 'xxx');
-    $sorting = new Sorting($rules, $input);
+    $params = new Params();
+    $params->add('date', 'xxx');
+    $sorting = new Sorting();
+    $sorting->setRules($rules);
+    $sorting->setParams($params);
     $columns = $sorting->getColumns(); // array('release.date' => 'desc');
-
 
 ### Putting it all together
 
-It's best to manage the construction of the entire query in a subclass of `BaseQuery`. Here's an example of a query built for use with the Doctrine ORM - it's a subclass of `AbstractDoctrineQuery` which in turn is a subclass `BaseQuery` and provides some utility methods for query construction:
+It's best to manage the construction of the entire query in a subclass of `BaseQuery`. Here's an example of a query built for use with the Doctrine ORM:
 
     namespace My\Model\Query;
 
     use Doctrine\ORM\QueryBuilder;
-    use Sirprize\Queried\Doctrine\ORM\AbstractDoctrineQuery;
+    use Sirprize\Queried\BaseQuery;
+    use Sirprize\Queried\Doctrine\ORM\SimpleConditionFactory;
 
-    class ReleaseQuery extends AbstractDoctrineQuery
+    class ReleaseQuery extends BaseQuery
     {
         protected $releaseAlias = 'release';
         protected $fromApplied = false;
@@ -215,7 +230,8 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->registerCondition('artist', new ArtistCondition($this->releaseAlias));
 
             // register a simple inline condition
-            $this->registerSimpleLikeCondition('label', 'label', $this->releaseAlias);
+            $conditionFactory = new SimpleConditionFactory($this->getTokenizer());
+            $this->registerCondition('label', $conditionFactory->like('label', $this->releaseAlias));
 
             // register another inline condition
             $pc = new BaseCondition();
@@ -223,19 +239,19 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->registerCondition('published', $pc);
             
             // define some sorting rules
-            $this->getSortingRules()->newRule('title')
+            $this->getSorting()->getRules()->newRule('title')
                 ->addAscColumn($this->releaseAlias.'.title', 'asc')
                 ->addDescColumn($this->releaseAlias.'.title', 'desc')
                 ->setDefaultOrder('asc')
             ;
 
-            $this->getSortingRules()->newRule('artist')
+            $this->getSorting()->getRules()->newRule('artist')
                 ->addAscColumn($this->releaseAlias.'.artist', 'asc')
                 ->addDescColumn($this->releaseAlias.'.artist', 'desc')
                 ->setDefaultOrder('asc')
             ;
         }
-        
+
         public function getCountQuery()
         {
             $this->applyFrom();
@@ -302,13 +318,28 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
                 }
             }
         }
+
+        public function applyRange($totalItems)
+        {
+            if (!$this->getRange())
+            {
+                return;
+            }
+
+            $this->getRange()->setTotalItems($totalItems);
+            
+            $this->getQueryBuilder()
+                ->setFirstResult($this->getRange()->getOffset())
+                ->setMaxResults($this->getRange()->getNumItems())
+            ;
+        }
     }
 
 ### Running the query
 
     use Sirprize\Paginate\Input\PageInput; // see github.com/sirprize/paginate
     use Sirprize\Paginate\Input\PageRage; // see github.com/sirprize/paginate
-    use Sirprize\Queried\Sorting\Input as SortingInput;
+    use Sirprize\Queried\Sorting\Params as SortingParams;
     use My\Model\Query\ReleaseQuery;
 
     // user input
@@ -324,10 +355,12 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     $pageInput->setDefaultNumItems(25);
     $pageInput->setMaxItems(100);
     $pageRange = new PageRange($pageInput);
-    
+
     // sorting
-    $sortingInput = new SortingInput(array($sort => $order));
-    $sortingInput->addDefault('title', 'asc');
+    $sortingParams = new SortingParams();
+    $sortingParams->add($sort, $order);
+    $sortingDefaults = new SortingParams();
+    $sortingDefaults->add('title', 'asc');
 
     // the query
     $query = new ReleaseQuery($em->createQueryBuilder());
@@ -336,9 +369,11 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
         ->activateCondition('published')
         ->activateCondition('label', array('label' => $label))
         ->activateCondition('artist', array('artist' => $artist))
-        ->setSortingInput($sortingInput)
         ->setRange($range)
     ;
+
+    $query->getSorting()->setParams($sortingParams);
+    $query->getSorting()->setDefaults($sortingDefaults);
 
     $count = $query->getCountQuery()->getSingleResult();
     $releases = $query->getFullQuery($count[1])->getResult();

@@ -9,7 +9,7 @@
 namespace Sirprize\Queried;
 
 use Sirprize\Paginate\Range\RangeInterface;
-use Sirprize\Queried\Sorting\Input;
+use Sirprize\Queried\Sorting\Params;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
 use Sirprize\Queried\Condition\Tokenizer;
@@ -27,8 +27,7 @@ class BaseQuery
     protected $activeConditions = array();
     protected $tokenizer = null;
     protected $range = null;
-    protected $sortingRules = array();
-    protected $sortingInput = array();
+    protected $sorting = null;
 
     public function registerConditions(array $conditions)
     {
@@ -55,7 +54,7 @@ class BaseQuery
 
         return $this;
     }
-    
+
     public function activateCondition($name, array $values = array())
     {
         if(!$this->hasCondition($name))
@@ -83,7 +82,7 @@ class BaseQuery
     {
         return array_key_exists($name, $this->registeredConditions) || array_key_exists($name, $this->activeConditions);
     }
-    
+
     public function hasActiveCondition($name)
     {
         return array_key_exists($name, $this->activeConditions);
@@ -99,11 +98,18 @@ class BaseQuery
     {
         return $this->range;
     }
-    
-    public function setSortingInput(Input $sortingInput)
+
+    public function getSorting()
     {
-        $this->sortingInput = $sortingInput;
-        return $this;
+        if(!$this->sorting)
+        {
+            $this->sorting = new Sorting();
+            $this->sorting->setParams(new Params());
+            $this->sorting->setDefaults(new Params());
+            $this->sorting->setRules(new Rules());
+        }
+
+        return $this->sorting;
     }
 
     public function getActiveConditions()
@@ -120,7 +126,7 @@ class BaseQuery
         
         return $this->activeConditions[$name];
     }
-    
+
     protected function getTokenizer()
     {
         if(!$this->tokenizer)
@@ -129,30 +135,5 @@ class BaseQuery
         }
         
         return $this->tokenizer;
-    }
-    
-    protected function getSortingInput()
-    {
-        if(!$this->sortingInput)
-        {
-            $this->sortingInput = new Input();
-        }
-        
-        return $this->sortingInput;
-    }
-    
-    protected function getSortingRules()
-    {
-        if(!$this->sortingRules)
-        {
-            $this->sortingRules = new Rules();
-        }
-        
-        return $this->sortingRules;
-    }
-    
-    protected function getSorting()
-    {
-        return new Sorting($this->getSortingRules(), $this->getSortingInput());
     }
 }

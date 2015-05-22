@@ -20,9 +20,24 @@ class Rules
 
     public function newRule($name)
     {
-        return $this->rules[$name] = new Rule();
+        return $this->addRule($name, new Rule());
     }
-    
+
+    public function addRule($name, Rule $rule)
+    {
+        return $this->rules[$name] = $rule;
+    }
+
+    public function setRules(array $rules)
+    {
+        $this->rules = array();
+
+        foreach($rules as $name => $rule)
+        {
+            $this->addRule($name, $rule);
+        }
+    }
+
     public function findColumns($ruleName, $ruleOrder)
     {
         if(array_key_exists($ruleName, $this->rules))

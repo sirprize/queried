@@ -12,12 +12,12 @@ use Sirprize\Queried\Condition\Tokenizer;
 use Sirprize\Queried\Condition\BaseCondition;
 
 /**
- * SimpleConditionClosureFactory.
+ * SimpleConditionFactory.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-class SimpleConditionClosureFactory
+class SimpleConditionFactory
 {
     protected $tokenizer = null;
     
@@ -28,20 +28,20 @@ class SimpleConditionClosureFactory
     
     public function like($field, $alias = '')
     {
-        return $this->getConditionClosure($field, $alias, 'like');
+        return $this->getCondition($field, $alias, 'like');
     }
     
     public function is($field, $alias = '')
     {
-        return $this->getConditionClosure($field, $alias, 'is');
+        return $this->getCondition($field, $alias, 'is');
     }
     
     public function not($field, $alias = '')
     {
-        return $this->getConditionClosure($field, $alias, 'not');
+        return $this->getCondition($field, $alias, 'not');
     }
     
-    protected function getConditionClosure($field, $alias, $operation)
+    protected function getCondition($field, $alias, $operation)
     {
         if(!preg_match('/(is|not|like)/', $operation))
         {

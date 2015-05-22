@@ -8,17 +8,17 @@
  
 namespace Sirprize\Queried\Sorting\Factory;
 
-use Sirprize\Queried\Sorting\Input;
+use Sirprize\Queried\Sorting\Params;
 
 /**
- * Input.
+ * Params.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
-class InputFactory
+class ParamsFactory
 {
-    public function getInstance(array $input = array(), array $defaults = array())
+    public function getInstance(array $input = array())
     {
-        return new Input($input, $defaults);
+        return new Params($input);
     }
 }
