@@ -10,6 +10,7 @@ namespace Sirprize\Queried\Doctrine\ORM;
 
 use Sirprize\Queried\Condition\Tokenizer;
 use Sirprize\Queried\Condition\BaseCondition;
+use Sirprize\Queried\Doctrine\ORM\Exception\InvalidArgumentException;
 
 /**
  * SimpleConditionFactory.
@@ -43,9 +44,9 @@ class SimpleConditionFactory
     
     protected function getCondition($field, $alias, $operation)
     {
-        if(!preg_match('/(is|not|like)/', $operation))
+        if (!preg_match('/(is|not|like)/', $operation))
         {
-            throw new FactoryException(sprintf('Invalid operation: "%s"', $operation));
+            throw new InvalidArgumentException(sprintf('Invalid operation: "%s"', $operation));
         }
         
         $tokenizer = $this->tokenizer;
@@ -58,21 +59,21 @@ class SimpleConditionFactory
                 $alias .= ($alias) ? '.' : '';
                 $value = (array_key_exists('value', $values)) ? $values['value'] : null;
                 
-                if($operation == 'is')
+                if ($operation == 'is')
                 {
                     $condition
                         ->setClause("{$alias}$field = :$token")
                         ->addParam($token, $value)
                     ;
                 }
-                else if($operation == 'not')
+                else if ($operation == 'not')
                 {
                     $condition
                         ->setClause("{$alias}$field != :$token")
                         ->addParam($token, $value)
                     ;
                 }
-                else if($operation == 'like')
+                else if ($operation == 'like')
                 {
                     $condition
                         ->setClause("{$alias}$field LIKE :$token")
@@ -83,7 +84,7 @@ class SimpleConditionFactory
                 return $condition;
             }
             catch(\Exception $e) {
-                throw new FactoryException(sprintf('Error on field "%s": %s', $field, $e->getMessage()));
+                throw new InvalidArgumentException(sprintf('Error on field "%s": %s', $field, $e->getMessage()));
             }
         };
     }

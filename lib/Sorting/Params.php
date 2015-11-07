@@ -17,6 +17,11 @@ class Params
 {
     protected $params = array();
 
+    public function __construct(array $params = array())
+    {
+        $this->params = $params;
+    }
+
     public function set(array $params)
     {
         $this->params = $params;

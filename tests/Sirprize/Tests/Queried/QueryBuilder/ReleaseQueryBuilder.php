@@ -6,12 +6,14 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
+namespace Sirprize\Tests\Queried\QueryBuilderTest;
 
-use Sirprize\Queried\BaseQuery;
+require_once 'LabelCondition.php';
+
+use Sirprize\Queried\BaseQueryBuilder;
 use Sirprize\Queried\Condition\BaseCondition;
 
-class ReleaseQuery extends BaseQuery
+class ReleaseQueryBuilder extends BaseQueryBuilder
 {
     protected $alias = 'release';
     

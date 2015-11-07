@@ -9,19 +9,20 @@
 namespace Sirprize\Queried;
 
 use Sirprize\Paginate\Range\RangeInterface;
+use Sirprize\Queried\Exception\InvalidArgumentException;
+use Sirprize\Queried\Condition\ConditionInterface;
+use Sirprize\Queried\Condition\Tokenizer;
 use Sirprize\Queried\Sorting\Params;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
-use Sirprize\Queried\Condition\Tokenizer;
-use Sirprize\Queried\Condition\ConditionInterface;
 
 /**
- * BaseQuery.
+ * BaseQueryBuilder.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
  
-class BaseQuery
+class BaseQueryBuilder
 {
     protected $registeredConditions = array();
     protected $activeConditions = array();
@@ -31,7 +32,7 @@ class BaseQuery
 
     public function registerConditions(array $conditions)
     {
-        foreach($conditions as $name => $condition)
+        foreach ($conditions as $name => $condition)
         {
             $this->registerCondition($name, $condition);
         }
@@ -47,7 +48,7 @@ class BaseQuery
 
     public function activateConditions(array $conditions)
     {
-        foreach($conditions as $name => $values)
+        foreach ($conditions as $name => $values)
         {
             $this->activateCondition($name, $values);
         }
@@ -57,16 +58,16 @@ class BaseQuery
 
     public function activateCondition($name, array $values = array())
     {
-        if(!$this->hasCondition($name))
+        if (!$this->hasCondition($name))
         {
-            throw new QueryException(sprintf('No condition registered for key: "%s"', $name));
+            throw new InvalidArgumentException(sprintf('No condition registered for key: "%s"', $name));
         }
         
-        if($this->registeredConditions[$name] instanceof ConditionInterface)
+        if ($this->registeredConditions[$name] instanceof ConditionInterface)
         {
             $this->activeConditions[$name] = $this->registeredConditions[$name]->setValues($values);
         }
-        else if(is_callable($this->registeredConditions[$name]))
+        else if (is_callable($this->registeredConditions[$name]))
         {
             $this->activeConditions[$name] = $this->registeredConditions[$name]($values);
         }
@@ -101,7 +102,7 @@ class BaseQuery
 
     public function getSorting()
     {
-        if(!$this->sorting)
+        if (!$this->sorting)
         {
             $this->sorting = new Sorting();
             $this->sorting->setParams(new Params());
@@ -119,9 +120,9 @@ class BaseQuery
 
     protected function getActiveCondition($name)
     {
-        if(!$this->hasActiveCondition($name))
+        if (!$this->hasActiveCondition($name))
         {
-            throw new QueryException(sprintf('No active condition for key: "%s"', $name));
+            throw new InvalidArgumentException(sprintf('No active condition for key: "%s"', $name));
         }
         
         return $this->activeConditions[$name];
@@ -129,7 +130,7 @@ class BaseQuery
 
     protected function getTokenizer()
     {
-        if(!$this->tokenizer)
+        if (!$this->tokenizer)
         {
             $this->tokenizer = new Tokenizer();
         }

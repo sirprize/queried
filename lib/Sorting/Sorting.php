@@ -82,9 +82,9 @@ class Sorting
         {
             $expressions = array();
             
-            foreach($params as $rule => $direction)
+            foreach ($params as $rule => $direction)
             {
-                foreach($rules->findColumns($rule, $direction) as $sort => $order)
+                foreach ($rules->findColumns($rule, $direction) as $sort => $order)
                 {
                     $expressions[$sort] = $order;
                 }
@@ -98,7 +98,7 @@ class Sorting
             $expressions = $getColumns($this->params->get());
         }
 
-        if(!count($expressions) && $this->defaults)
+        if (!count($expressions) && $this->defaults)
         {
             $expressions = $getColumns($this->defaults->get());
         }

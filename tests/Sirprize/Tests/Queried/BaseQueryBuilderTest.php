@@ -8,49 +8,49 @@
  
 namespace Sirprize\Tests\Queried;
 
-use Sirprize\Queried\BaseQuery;
+use Sirprize\Queried\BaseQueryBuilder;
 use Sirprize\Queried\Condition\BaseCondition;
 
-class BaseQueryTest extends \PHPUnit_Framework_TestCase
+class BaseQueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    protected $query = null;
+    protected $queryBuilder = null;
     
     public function setup()
     {
-        $this->query = new BaseQuery();
+        $this->queryBuilder = new BaseQueryBuilder();
     }
     
     public function tearDown()
     {
-        $this->query = null;
+        $this->queryBuilder = null;
     }
     
     public function testAddCondition()
     {
-        $this->assertInstanceOf('Sirprize\Queried\BaseQuery', $this->query->registerCondition('someCondition', new BaseCondition()));
-        $this->assertTrue($this->query->hasCondition('someCondition'));
-        $this->assertFalse($this->query->hasActiveCondition('someCondition'));
+        $this->assertInstanceOf('Sirprize\Queried\BaseQueryBuilder', $this->queryBuilder->registerCondition('someCondition', new BaseCondition()));
+        $this->assertTrue($this->queryBuilder->hasCondition('someCondition'));
+        $this->assertFalse($this->queryBuilder->hasActiveCondition('someCondition'));
     }
 
     public function testActivateCondition()
     {
-        $this->query->registerCondition('someCondition', new BaseCondition());
-        $this->query->activateCondition('someCondition');
-        $this->assertTrue($this->query->hasActiveCondition('someCondition'));
+        $this->queryBuilder->registerCondition('someCondition', new BaseCondition());
+        $this->queryBuilder->activateCondition('someCondition');
+        $this->assertTrue($this->queryBuilder->hasActiveCondition('someCondition'));
     }
 
     /**
-     * @expectedException Sirprize\Queried\QueryException
+     * @expectedException Sirprize\Queried\Exception\InvalidArgumentException
      */
     public function testActivateNonExistingCondition()
     {
-        $this->query->activateCondition('asdfdsf');
+        $this->queryBuilder->activateCondition('asdfdsf');
     }
     
     public function testSetRange()
     {
         $range = $this->getMock('Sirprize\Paginate\Range\RangeInterface');
-        $this->assertInstanceOf('Sirprize\Queried\BaseQuery', $this->query->setRange($range));
+        $this->assertInstanceOf('Sirprize\Queried\BaseQueryBuilder', $this->queryBuilder->setRange($range));
     }
 
     public function testFull()
@@ -64,31 +64,32 @@ class BaseQueryTest extends \PHPUnit_Framework_TestCase
         $digitalCondition = new BaseCondition();
         $digitalCondition->setClause("(release.format = 'MP3' OR release.format = 'WAV'");
 
-        $query = new BaseQuery();
+        $queryBuilder = new BaseQueryBuilder();
 
-        $query
+        $queryBuilder
             ->registerCondition('published', $publishedCondition)
             ->registerCondition('physical', $physicalCondition)
             ->registerCondition('digital', $physicalCondition)
         ;
 
-        $query->activateCondition('published');
+        $queryBuilder->activateCondition('published');
 
-        if (true) {
-            $query->activateCondition('digital');
+        if (true)
+        {
+            $queryBuilder->activateCondition('digital');
         }
-        else {
-            $query->activateCondition('physical');
+        else
+        {
+            $queryBuilder->activateCondition('physical');
         }
 
         $clauses = array();
 
-        foreach($query->getActiveConditions() as $condition)
+        foreach ($queryBuilder->getActiveConditions() as $condition)
         {
             $clauses[] = $condition->getClause();
         }
 
         $statement = 'SELECT * FROM release WHERE ' . implode(' AND ', $clauses);
-        #die($statement);
     }
 }

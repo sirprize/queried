@@ -6,7 +6,7 @@
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
  
-namespace Sirprize\Tests\Queried\UseCaseQueryWithInlineAndExternalConditions;
+namespace Sirprize\Tests\Queried\QueryBuilderTest;
 
 use Sirprize\Queried\Condition\BaseCondition;
 

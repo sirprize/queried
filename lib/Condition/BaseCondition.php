@@ -21,6 +21,14 @@ class BaseCondition implements ConditionInterface
     protected $types = array();
     protected $values = array();
 
+    public function reset()
+    {
+        $this->clause = '';
+        $this->params = array();
+        $this->types = array();
+        $this->values = array();
+    }
+
     public function setClause($clause)
     {
         $this->clause = $clause;
@@ -34,7 +42,7 @@ class BaseCondition implements ConditionInterface
 
     public function setParams(array $params)
     {
-        foreach($params as $name => $value)
+        foreach ($params as $name => $value)
         {
             $this->addParam($name, $value);
         }
@@ -55,7 +63,7 @@ class BaseCondition implements ConditionInterface
 
     public function setTypes(array $types)
     {
-        foreach($types as $name => $type)
+        foreach ($types as $name => $type)
         {
             $this->addType($name, $type);
         }
@@ -76,7 +84,7 @@ class BaseCondition implements ConditionInterface
 
     public function getType($name)
     {
-        if(!array_key_exists($name, $this->types))
+        if (!array_key_exists($name, $this->types))
         {
             return null;
         }
@@ -91,7 +99,7 @@ class BaseCondition implements ConditionInterface
 
     public function setValues(array $values)
     {
-        foreach($values as $name => $value)
+        foreach ($values as $name => $value)
         {
             $this->addValue($name, $value);
         }
@@ -112,7 +120,7 @@ class BaseCondition implements ConditionInterface
     
     protected function getValue($name)
     {
-        if(!array_key_exists($name, $this->values))
+        if (!array_key_exists($name, $this->values))
         {
             return null;
         }
