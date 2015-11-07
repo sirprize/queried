@@ -56,6 +56,11 @@ class BaseQueryBuilder
         return $this;
     }
 
+    public function activateSimpleCondition($name, $value)
+    {
+        return $this->activateCondition($name, array('value' => $value));
+    }
+
     public function activateCondition($name, array $values = array())
     {
         if (!$this->hasCondition($name))

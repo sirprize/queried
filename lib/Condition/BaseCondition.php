@@ -26,7 +26,6 @@ class BaseCondition implements ConditionInterface
         $this->clause = '';
         $this->params = array();
         $this->types = array();
-        $this->values = array();
     }
 
     public function setClause($clause)
