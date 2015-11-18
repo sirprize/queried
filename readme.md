@@ -4,7 +4,7 @@ Database/ORM-agnostic query construction helper
 
 ## Description
 
-Parsing input, setting defaults and constructing `SELECT` queries can quickly become messy. Queried helps organizing  clauses for `WHERE`, `HAVING` and `ORDER BY`, making it easy to apply input as well as defaults when executing the query.
+Parsing input, setting defaults and constructing `SELECT` queries can quickly become a mess. Queried helps organizing clauses for `WHERE`, `HAVING` and `ORDER BY`, making it easy to apply input as well as defaults when executing the query.
 
 ## Usage
 
@@ -212,14 +212,12 @@ No defaults and invalid parameters (invalid ordering, valid orderings are "asc" 
 
 It's best to manage the construction of the entire query in a subclass of `BaseQueryBuilder`. Here's an example of a query built for use with the Doctrine ORM:
 
-    namespace My\Model\Query;
-
     use Doctrine\ORM\EntityManager;
     use Sirprize\Queried\BaseQueryBuilder;
-    use Sirprize\Queried\Doctrine\ORM\SimpleConditionFactory;
 
-    class ReleaseQuery extends BaseQueryBuilder
+    class ReleaseQueryBuilder extends BaseQueryBuilder
     {
+        protected $queryBuilder = null;
         protected $releaseAlias = 'release';
 
         public function __construct(EntityManager $entityManager)
@@ -229,11 +227,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             // register the external condition we built earlier
             $this->registerCondition('artist', new ArtistCondition($this->releaseAlias));
 
-            // register a simple inline condition
-            $conditionFactory = new SimpleConditionFactory($this->getTokenizer());
-            $this->registerCondition('label', $conditionFactory->like('label', $this->releaseAlias));
-
-            // register another inline condition
+            // register an inline condition
             $pc = new BaseCondition();
             $pc->setClause("({$this->releaseAlias}.date <= CURRENT_DATE() AND {$this->releaseAlias}.published = 1)");
             $this->registerCondition('published', $pc);
@@ -264,14 +258,13 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             ;
         }
         
-        public function getPaginatedQuery($totalItems)
+        public function getQuery()
         {
             $this->reset();
             $this->applyFrom();
             $this->applyConditions();
-            $this->applyRange($totalItems);
             $this->applySorting();
-            
+
             return $this->getQueryBuilder()
                 ->select($this->releaseAlias)
                 ->getQuery()
@@ -290,16 +283,6 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->getQueryBuilder()
                 ->resetDQLParts()
                 ->setParameters(new ArrayCollection())
-            ;
-        }
-
-        public function applyRange($totalItems)
-        {
-            $this->getRange()->setTotalItems($totalItems);
-
-            $this->getQueryBuilder()
-                ->setFirstResult($this->getRange()->getOffset())
-                ->setMaxResults($this->getRange()->getNumItems())
             ;
         }
 
@@ -334,24 +317,13 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
 
 ### Running the query
 
-    use Sirprize\Paginate\Input\PageInput; // see github.com/sirprize/paginate
-    use Sirprize\Paginate\Input\PageRage; // see github.com/sirprize/paginate
     use Sirprize\Queried\Sorting\Params as SortingParams;
-    use My\Model\Query\ReleaseQuery;
 
-    // user input
-    $perPage = (array_key_exists('per_page', $_GET)) ? $_GET['per_page'] : null;
-    $page = (array_key_exists('page', $_GET)) ? $_GET['page'] : null;
+    // input
     $sort = (array_key_exists('sort', $_GET)) ? $_GET['sort'] : null;
     $order = (array_key_exists('order', $_GET)) ? $_GET['order'] : null;
     $label = (array_key_exists('label', $_GET)) ? $_GET['label'] : null;
     $artist = (array_key_exists('artist', $_GET)) ? $_GET['artist'] : null;
-
-    // pagination
-    $pageInput = new PageInput($page, $perPage);
-    $pageInput->setDefaultNumItems(25);
-    $pageInput->setMaxItems(100);
-    $pageRange = new PageRange($pageInput);
 
     // sorting
     $sortingParams = new SortingParams();
@@ -360,20 +332,18 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     $sortingDefaults->add('title', 'asc');
 
     // the query
-    $queryBuilder = new ReleaseQuery($em->createQueryBuilder());
+    $queryBuilder = new ReleaseQueryBuilder($em);
 
     $queryBuilder
         ->activateCondition('published')
-        ->activateCondition('label', array('label' => $label))
         ->activateCondition('artist', array('artist' => $artist))
-        ->setRange($range)
     ;
 
     $queryBuilder->getSorting()->setParams($sortingParams);
     $queryBuilder->getSorting()->setDefaults($sortingDefaults);
 
     $count = $queryBuilder->getCountQuery()->getSingleResult();
-    $releases = $queryBuilder->getFullQuery($count[1])->getResult();
+    $releases = $queryBuilder->getQuery()->getResult();
 
 ## License
 

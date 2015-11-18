@@ -8,7 +8,6 @@
  
 namespace Sirprize\Queried;
 
-use Sirprize\Paginate\Range\RangeInterface;
 use Sirprize\Queried\Exception\InvalidArgumentException;
 use Sirprize\Queried\Condition\ConditionInterface;
 use Sirprize\Queried\Condition\Tokenizer;
@@ -27,7 +26,6 @@ class BaseQueryBuilder
     protected $registeredConditions = array();
     protected $activeConditions = array();
     protected $tokenizer = null;
-    protected $range = null;
     protected $sorting = null;
 
     public function registerConditions(array $conditions)
@@ -40,7 +38,7 @@ class BaseQueryBuilder
         return $this;
     }
 
-    public function registerCondition($name, $condition)
+    public function registerCondition($name, ConditionInterface $condition)
     {
         $this->registeredConditions[$name] = $condition;
         return $this;
@@ -56,31 +54,15 @@ class BaseQueryBuilder
         return $this;
     }
 
-    public function activateSimpleCondition($name, $value)
-    {
-        return $this->activateCondition($name, array('value' => $value));
-    }
-
     public function activateCondition($name, array $values = array())
     {
         if (!$this->hasCondition($name))
         {
             throw new InvalidArgumentException(sprintf('No condition registered for key: "%s"', $name));
         }
-        
-        if ($this->registeredConditions[$name] instanceof ConditionInterface)
-        {
-            $this->activeConditions[$name] = $this->registeredConditions[$name]->setValues($values);
-        }
-        else if (is_callable($this->registeredConditions[$name]))
-        {
-            $this->activeConditions[$name] = $this->registeredConditions[$name]($values);
-        }
-        else {
-            $this->activeConditions[$name] = new $this->registeredConditions[$name];
-            $this->activeConditions[$name]->setValues($values);
-        }
-        
+
+        $this->activeConditions[$name] = $this->registeredConditions[$name]->setValues($values);
+
         return $this;
     }
 
@@ -94,25 +76,11 @@ class BaseQueryBuilder
         return array_key_exists($name, $this->activeConditions);
     }
 
-    public function setRange(RangeInterface $range)
-    {
-        $this->range = $range;
-        return $this;
-    }
-
-    public function getRange()
-    {
-        return $this->range;
-    }
-
     public function getSorting()
     {
         if (!$this->sorting)
         {
             $this->sorting = new Sorting();
-            $this->sorting->setParams(new Params());
-            $this->sorting->setDefaults(new Params());
-            $this->sorting->setRules(new Rules());
         }
 
         return $this->sorting;
