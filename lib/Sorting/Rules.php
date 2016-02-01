@@ -38,22 +38,36 @@ class Rules
         }
     }
 
-    public function findColumns($ruleName, $ruleOrder)
+    public function hasRule($ruleName)
     {
-        if (array_key_exists($ruleName, $this->rules))
+        return array_key_exists($ruleName, $this->rules);
+    }
+
+    public function findRuleOrder($ruleName, $ruleOrder)
+    {
+        $ruleOrder == 'asc';
+
+        if ($this->hasRule($ruleName))
         {
             $ruleOrder = strtolower($ruleOrder);
             $ruleOrder = ($ruleOrder == 'asc' || $ruleOrder == 'desc') ? $ruleOrder : null;
             $ruleOrder = ($ruleOrder) ? $ruleOrder : $this->rules[$ruleName]->getDefaultOrder();
             $ruleOrder = ($ruleOrder) ? $ruleOrder : 'asc';
-            
-            if ($ruleOrder == 'asc')
+        }
+
+        return $ruleOrder;
+    }
+
+    public function findColumns($ruleName, $ruleOrder)
+    {
+        if ($this->hasRule($ruleName))
+        {
+            if ($this->findRuleOrder($ruleName, $ruleOrder) == 'asc')
             {
                 return $this->rules[$ruleName]->getAscColumns();
             }
-            else {
-                return $this->rules[$ruleName]->getDescColumns();
-            }
+
+            return $this->rules[$ruleName]->getDescColumns();
         }
         
         return array();
