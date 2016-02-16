@@ -13,7 +13,7 @@ namespace Sirprize\Queried\Sorting;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class Sorting
 {
     protected $rules = null;
@@ -70,39 +70,69 @@ class Sorting
 
     public function getColumns()
     {
-        if (!$this->rules)
-        {
-            return array();
-        }
+        $rule = null;
+        $direction = null;
 
-        $expressions = array();
-        $rules = $this->rules;
-
-        $getColumns = function($params) use ($rules)
-        {
-            $expressions = array();
-            
-            foreach ($params as $rule => $direction)
-            {
-                foreach ($rules->findColumns($rule, $direction) as $sort => $order)
-                {
-                    $expressions[$sort] = $order;
-                }
-            }
-            
-            return $expressions;
-        };
-        
         if ($this->params)
         {
-            $expressions = $getColumns($this->params->get());
+            $rule = $this->rules->getRule($this->params->getRule());
+            $direction = $this->params->getDirection();
         }
 
-        if (!count($expressions) && $this->defaults)
+        if (!$rule && $this->defaults)
         {
-            $expressions = $getColumns($this->defaults->get());
+            $rule = $this->rules->getRule($this->defaults->getRule());
+            $direction = $this->defaults->getDirection();
         }
-        
-        return $expressions;
+
+        return
+            ($rule)
+            ? $rule->getColumns($direction)
+            : []
+        ;
+    }
+
+    public function getApplicableRule()
+    {
+        $rule = null;
+        $name = null;
+
+        if ($this->params)
+        {
+            $name = $this->params->getRule();
+            $rule = $this->rules->getRule($name);
+        }
+
+        if (!$rule && $this->defaults)
+        {
+            $name = $this->defaults->getRule();
+            $rule = $this->rules->getRule($name);
+        }
+
+        return ($rule) ? $name : null;
+    }
+
+    public function getApplicableDirection()
+    {
+        $rule = null;
+        $direction = null;
+
+        if ($this->params)
+        {
+            $rule = $this->rules->getRule($this->params->getRule());
+            $direction = $this->params->getDirection();
+        }
+
+        if (!$rule && $this->defaults)
+        {
+            $rule = $this->rules->getRule($this->defaults->getRule());
+            $direction = $this->defaults->getDirection();
+        }
+
+        return
+            ($rule)
+            ? $rule->getApplicableDirection($direction)
+            : null
+        ;
     }
 }

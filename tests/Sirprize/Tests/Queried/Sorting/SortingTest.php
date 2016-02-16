@@ -5,7 +5,7 @@
  *
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 namespace Sirprize\Tests\Queried\Sorting;
 
 use Sirprize\Queried\Sorting\Rules;
@@ -23,13 +23,13 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $this->rules->newRule('title')
             ->addAscColumn('release.title', 'asc')
             ->addDescColumn('release.title', 'desc')
-            ->setDefaultOrder('asc')
+            ->setDefaultDirection('asc')
         ;
-        
+
         $this->rules->newRule('date')
             ->addAscColumn('release.date', 'asc')
             ->addDescColumn('release.date', 'desc')
-            ->setDefaultOrder('desc')
+            ->setDefaultDirection('desc')
         ;
     }
 
@@ -40,40 +40,24 @@ class SortingTest extends \PHPUnit_Framework_TestCase
 
     public function testParamsToRules()
     {
-        $params = new Params();
-        $params->add('title', 'asc');
+        $params = new Params('title', 'asc');
         $sorting = new Sorting();
         $sorting->setRules($this->rules);
         $sorting->setParams($params);
-        $columns = $sorting->getColumns();
 
+        $columns = $sorting->getColumns();
         $this->assertArrayHasKey('release.title', $columns);
         $this->assertSame(1, count($columns));
     }
 
-    public function testNestedSortingParams()
-    {
-        $params = new Params();
-        $params->add('title', 'asc');
-        $params->add('date', 'asc');
-        $sorting = new Sorting();
-        $sorting->setRules($this->rules);
-        $sorting->setParams($params);
-        $columns = $sorting->getColumns();
-
-        $this->assertArrayHasKey('release.title', $columns);
-        $this->assertArrayHasKey('release.date', $columns);
-    }
-
     public function testNoParamsWithDefault()
     {
-        $defaults = new Params();
-        $defaults->add('title', 'asc');
+        $defaults = new Params('title', 'asc');
         $sorting = new Sorting();
         $sorting->setRules($this->rules);
         $sorting->setDefaults($defaults);
-        $columns = $sorting->getColumns();
 
+        $columns = $sorting->getColumns();
         $this->assertArrayHasKey('release.title', $columns);
     }
 
@@ -83,8 +67,8 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         $sorting = new Sorting();
         $sorting->setRules($this->rules);
         $sorting->setParams($params);
-        $columns = $sorting->getColumns();
 
+        $columns = $sorting->getColumns();
         $this->assertSame(0, count($columns));
     }
 }

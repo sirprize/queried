@@ -5,7 +5,7 @@
  *
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 namespace Sirprize\Queried\Sorting;
 
 /**
@@ -13,10 +13,10 @@ namespace Sirprize\Queried\Sorting;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class Rules
 {
-    protected $rules = array();
+    protected $rules = [];
 
     public function newRule($name)
     {
@@ -30,7 +30,7 @@ class Rules
 
     public function setRules(array $rules)
     {
-        $this->rules = array();
+        $this->rules = [];
 
         foreach ($rules as $name => $rule)
         {
@@ -38,38 +38,17 @@ class Rules
         }
     }
 
-    public function hasRule($ruleName)
+    public function hasRule($rule)
     {
-        return array_key_exists($ruleName, $this->rules);
+        return array_key_exists($rule, $this->rules);
     }
 
-    public function findRuleOrder($ruleName, $ruleOrder)
+    public function getRule($name)
     {
-        $ruleOrder == 'asc';
-
-        if ($this->hasRule($ruleName))
-        {
-            $ruleOrder = strtolower($ruleOrder);
-            $ruleOrder = ($ruleOrder == 'asc' || $ruleOrder == 'desc') ? $ruleOrder : null;
-            $ruleOrder = ($ruleOrder) ? $ruleOrder : $this->rules[$ruleName]->getDefaultOrder();
-            $ruleOrder = ($ruleOrder) ? $ruleOrder : 'asc';
-        }
-
-        return $ruleOrder;
-    }
-
-    public function findColumns($ruleName, $ruleOrder)
-    {
-        if ($this->hasRule($ruleName))
-        {
-            if ($this->findRuleOrder($ruleName, $ruleOrder) == 'asc')
-            {
-                return $this->rules[$ruleName]->getAscColumns();
-            }
-
-            return $this->rules[$ruleName]->getDescColumns();
-        }
-        
-        return array();
+        return
+            ($this->hasRule($name))
+            ? $this->rules[$name]
+            : null
+        ;
     }
 }

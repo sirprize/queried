@@ -15,27 +15,34 @@ namespace Sirprize\Queried\Sorting;
  */
 class Params
 {
-    protected $params = array();
+    protected $rule = null;
+    protected $direction = null;
 
-    public function __construct(array $params = array())
+    public function __construct($rule = null, $direction = null)
     {
-        $this->params = $params;
+        $this->rule = $rule;
+        $this->direction = $direction;
     }
 
-    public function set(array $params)
+    public function setRule($rule)
     {
-        $this->params = $params;
+        $this->rule = $rule;
         return $this;
     }
 
-    public function add($sort, $order)
+    public function getRule()
     {
-        $this->params[$sort] = $order;
+        return $this->rule;
+    }
+
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
         return $this;
     }
 
-    public function get()
+    public function getDirection()
     {
-        return $this->params;
+        return $this->direction;
     }
 }

@@ -15,14 +15,10 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     public function testSet()
     {
         $params = new Params();
-        $params->set(array('title' => 'asc'));
-        $this->assertArrayHasKey('title', $params->get());
-    }
+        $params->setRule('title');
+        $params->setDirection('asc');
 
-    public function testAdd()
-    {
-        $params = new Params();
-        $params->add('title', 'asc');
-        $this->assertArrayHasKey('title', $params->get());
+        $this->assertEquals('title', $params->getRule());
+        $this->assertEquals('asc', $params->getDirection());
     }
 }

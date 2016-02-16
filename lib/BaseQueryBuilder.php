@@ -5,14 +5,12 @@
  *
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 namespace Sirprize\Queried;
 
 use Sirprize\Queried\Exception\InvalidArgumentException;
 use Sirprize\Queried\Condition\ConditionInterface;
 use Sirprize\Queried\Condition\Tokenizer;
-use Sirprize\Queried\Sorting\Params;
-use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Sorting;
 
 /**
@@ -20,7 +18,7 @@ use Sirprize\Queried\Sorting\Sorting;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class BaseQueryBuilder
 {
     protected $registeredConditions = array();
@@ -97,7 +95,7 @@ class BaseQueryBuilder
         {
             throw new InvalidArgumentException(sprintf('No active condition for key: "%s"', $name));
         }
-        
+
         return $this->activeConditions[$name];
     }
 
@@ -107,7 +105,7 @@ class BaseQueryBuilder
         {
             $this->tokenizer = new Tokenizer();
         }
-        
+
         return $this->tokenizer;
     }
 }

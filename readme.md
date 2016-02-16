@@ -125,7 +125,7 @@ Sorting is normally expressed by one or more field names, each with a direction 
         ->addAscColumn('release.date', 'asc')
         ->addDescColumn('release.date', 'asc')
         ->addDescColumn('release.date', 'asc')
-        ->setDefaultOrder('asc')
+        ->setDefaultDirection('asc')
     ;
 
     $columns = $dateRule->getAscColumns(); // array('release.date' => 'desc', 'release.title.asc')
@@ -142,13 +142,13 @@ The Sorting class maps rule names (eg from user input) to rules while applying d
     $rules->newRule('title')
         ->addAscColumn('release.title', 'asc')
         ->addDescColumn('release.title', 'desc')
-        ->setDefaultOrder('asc')
+        ->setDefaultDirection('asc')
     ;
     
     $rules->newRule('date')
         ->addAscColumn('release.date', 'asc')
         ->addDescColumn('release.date', 'desc')
-        ->setDefaultOrder('desc')
+        ->setDefaultDirection('desc')
     ;
 
 No defaults, no parameters
@@ -161,29 +161,16 @@ No defaults, no parameters
 
 Single default
 
-    $defaults = new Params();
-    $defaults->add('title', 'asc');
+    $defaults = new Params('title', 'asc');
     $sorting = new Sorting();
     $sorting->setRules($rules);
     $sorting->setDefaults($defaults);
     $columns = $sorting->getColumns(); // array('release.title' => 'asc');
 
-Multiple defaults
-
-    $defaults = new Params();
-    $defaults->add('title', 'asc');
-    $defaults->add('date', 'asc');
-    $sorting = new Sorting();
-    sorting->setRules($rules);
-    $sorting->setDefaults($defaults);
-    $columns = $sorting->getColumns(); // array('release.title' => 'asc', 'release.date' => 'asc');
-
 Defaults and valid parameters
 
-    $params = new Params();
-    $params->add('date', 'asc');
-    $defaults = new Params();
-    $defaults->add('title', 'asc');
+    $params = new Params('date', 'asc');
+    $defaults = new Params('title', 'asc');
     $sorting = new Sorting();
     $sorting->setRules($rules);
     $sorting->setParams($params);
@@ -192,8 +179,7 @@ Defaults and valid parameters
 
 No defaults and invalid parameters (non-existing rule name)
 
-    $params = new Params();
-    $params->add('xxx', 'asc');
+    $params = new Params('xxx', 'asc');
     $sorting = new Sorting();
     $sorting->setRules($rules);
     $sorting->setParams($params);
@@ -201,8 +187,7 @@ No defaults and invalid parameters (non-existing rule name)
 
 No defaults and invalid parameters (invalid ordering, valid orderings are "asc" or "desc")
 
-    $params = new Params();
-    $params->add('date', 'xxx');
+    $params = new Params('date', 'xxx');
     $sorting = new Sorting();
     $sorting->setRules($rules);
     $sorting->setParams($params);
@@ -236,13 +221,13 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->getSorting()->getRules()->newRule('title')
                 ->addAscColumn($this->releaseAlias.'.title', 'asc')
                 ->addDescColumn($this->releaseAlias.'.title', 'desc')
-                ->setDefaultOrder('asc')
+                ->setDefaultDirection('asc')
             ;
 
             $this->getSorting()->getRules()->newRule('artist')
                 ->addAscColumn($this->releaseAlias.'.artist', 'asc')
                 ->addDescColumn($this->releaseAlias.'.artist', 'desc')
-                ->setDefaultOrder('asc')
+                ->setDefaultDirection('asc')
             ;
         }
 
@@ -326,10 +311,8 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     $artist = (array_key_exists('artist', $_GET)) ? $_GET['artist'] : null;
 
     // sorting
-    $sortingParams = new SortingParams();
-    $sortingParams->add($sort, $order);
-    $sortingDefaults = new SortingParams();
-    $sortingDefaults->add('title', 'asc');
+    $sortingParams = new SortingParams($sort, $order);
+    $sortingDefaults = new SortingParams('title', 'asc');
 
     // the query
     $queryBuilder = new ReleaseQueryBuilder($em);

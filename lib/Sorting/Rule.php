@@ -5,7 +5,7 @@
  *
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 namespace Sirprize\Queried\Sorting;
 
 /**
@@ -13,43 +13,67 @@ namespace Sirprize\Queried\Sorting;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class Rule
 {
-    protected $ascColumns = array();
-    protected $descColumns = array();
-    protected $defaultOrder = null;
-    
-    public function addAscColumn($column, $order)
+    protected $ascColumns = [];
+    protected $descColumns = [];
+    protected $defaultDirection = 'asc';
+
+    public function addAscColumn($column, $direction)
     {
-        $this->ascColumns[$column] = $order;
+        $this->ascColumns[$column] = $this->validateDirection($direction);
         return $this;
     }
-    
+
     public function getAscColumns()
     {
         return $this->ascColumns;
     }
-    
-    public function addDescColumn($column, $order)
+
+    public function addDescColumn($column, $direction)
     {
-        $this->descColumns[$column] = $order;
+        $this->descColumns[$column] = $this->validateDirection($direction);
         return $this;
     }
-    
+
     public function getDescColumns()
     {
         return $this->descColumns;
     }
-    
-    public function setDefaultOrder($defaultOrder)
+
+    public function setDefaultDirection($defaultDirection)
     {
-        $this->defaultOrder = $defaultOrder;
+        $this->defaultDirection = $this->validateDirection($defaultDirection);
         return $this;
     }
-    
-    public function getDefaultOrder()
+
+    public function getDefaultDirection()
     {
-        return $this->defaultOrder;
+        return $this->defaultDirection;
+    }
+
+    public function getColumns($direction)
+    {
+        $direction = $this->getApplicableDirection($direction);
+
+        return
+            ($direction === 'asc')
+            ? $this->getAscColumns()
+            : $this->getDescColumns()
+        ;
+    }
+
+    public function getApplicableDirection($direction)
+    {
+        $direction = strtolower(trim($direction));
+        $direction = ($direction === 'asc' || $direction === 'desc') ? $direction : null;
+        return ($direction) ? $direction : $this->defaultDirection;
+    }
+
+    protected function validateDirection($direction)
+    {
+        $direction = strtolower(trim($direction));
+        return ($direction === 'asc' || $direction === 'desc') ? $direction : 'asc';
     }
 }

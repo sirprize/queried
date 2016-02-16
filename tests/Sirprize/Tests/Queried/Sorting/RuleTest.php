@@ -21,13 +21,13 @@ class RuleTest extends \PHPUnit_Framework_TestCase
             ->addAscColumn('release.date', 'desc')
             ->addDescColumn('release.title', 'desc')
             ->addDescColumn('release.date', 'desc')
-            ->setDefaultOrder('asc')
+            ->setDefaultDirection('asc')
         ;
         
         $this->assertArrayHasKey('release.title', $rule->getAscColumns());
         $this->assertArrayHasKey('release.date', $rule->getAscColumns());
         $this->assertArrayHasKey('release.title', $rule->getDescColumns());
         $this->assertArrayHasKey('release.date', $rule->getDescColumns());
-        $this->assertSame('asc', $rule->getDefaultOrder());
+        $this->assertSame('asc', $rule->getDefaultDirection());
     }
 }
