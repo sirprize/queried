@@ -14,12 +14,12 @@ use Sirprize\Queried\Condition\Tokenizer;
 use Sirprize\Queried\Sorting\Sorting;
 
 /**
- * BaseQueryBuilder.
+ * BaseQueryConfigurator.
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
 
-class BaseQueryBuilder
+class BaseQueryConfigurator
 {
     protected $registeredConditions = array();
     protected $activeConditions = array();

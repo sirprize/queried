@@ -10,9 +10,9 @@ Parsing input, setting defaults and constructing `SELECT` queries can quickly be
 
 ### Creating and activating simple WHERE conditions
 
-First we'll take a look at organizing conditions for the `WHERE` and `HAVING` parts of a query statement. The basic idea is to prepare clauses describing specific conditions, register them with a query object and then activate them individually based on application requirements and user input. Each clause is wrapped in a `BaseCondition` object. Those objects are then registered with a `BaseQueryBuilder` object:
+First we'll take a look at organizing conditions for the `WHERE` and `HAVING` parts of a query statement. The basic idea is to prepare clauses describing specific conditions, register them with a query object and then activate them individually based on application requirements and user input. Each clause is wrapped in a `BaseCondition` object. Those objects are then registered with a `BaseQueryConfigurator` object:
 
-    use Sirprize\Queried\BaseQueryBuilder;
+    use Sirprize\Queried\BaseQueryConfigurator;
     use Sirprize\Queried\Condition\BaseCondition;
 
     $publishedCondition = new BaseCondition();
@@ -24,9 +24,9 @@ First we'll take a look at organizing conditions for the `WHERE` and `HAVING` pa
     $digitalCondition = new BaseCondition();
     $digitalCondition->setClause("(release.format = 'MP3' OR release.format = 'WAV'");
 
-    $queryBuilder = new BaseQueryBuilder();
+    $queryConfigurator = new BaseQueryConfigurator();
 
-    $queryBuilder
+    $queryConfigurator
         ->registerCondition('published', $publishedCondition)
         ->registerCondition('physical', $physicalCondition)
         ->registerCondition('digital', $physicalCondition)
@@ -34,7 +34,7 @@ First we'll take a look at organizing conditions for the `WHERE` and `HAVING` pa
 
 Next we'll activate some of the conditions according application requirements. Only published releases with a release-date of today or older must make it into the result:
 
-    $queryBuilder->activateCondition('published');
+    $queryConfigurator->activateCondition('published');
 
 Then the user can choose from digital or physical releases by setting the `format` parameter (eg `/releases?format=digital`)
 
@@ -42,15 +42,15 @@ Then the user can choose from digital or physical releases by setting the `forma
 
     if ($format === 'digital')
     {
-        $queryBuilder->activateCondition('digital');
+        $queryConfigurator->activateCondition('digital');
     }
     else {
-        $queryBuilder->activateCondition('physical');
+        $queryConfigurator->activateCondition('physical');
     }
 
 And finally we'll collect the activated conditions and add them to our query statement:
 
-    foreach($queryBuilder->getActiveConditions() as $condition)
+    foreach($queryConfigurator->getActiveConditions() as $condition)
     {
         $clause = $condition->getClause();
         // Add clause to query
@@ -195,12 +195,12 @@ No defaults and invalid parameters (invalid ordering, valid orderings are "asc" 
 
 ### Putting it all together
 
-It's best to manage the construction of the entire query in a subclass of `BaseQueryBuilder`. Here's an example of a query built for use with the Doctrine ORM:
+It's best to manage the construction of the entire query in a subclass of `BaseQueryConfigurator`. Here's an example of a query built for use with the Doctrine ORM:
 
     use Doctrine\ORM\EntityManager;
-    use Sirprize\Queried\BaseQueryBuilder;
+    use Sirprize\Queried\BaseQueryConfigurator;
 
-    class ReleaseQueryBuilder extends BaseQueryBuilder
+    class ReleaseQueryConfigurator extends BaseQueryConfigurator
     {
         protected $queryBuilder = null;
         protected $releaseAlias = 'release';
@@ -237,7 +237,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->applyFrom();
             $this->applyConditions();
             
-            return $this->getQueryBuilder()
+            return $this->queryBuilder
                 ->select("COUNT({$this->releaseAlias}.id)")
                 ->getQuery()
             ;
@@ -250,7 +250,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->applyConditions();
             $this->applySorting();
 
-            return $this->getQueryBuilder()
+            return $this->queryBuilder
                 ->select($this->releaseAlias)
                 ->getQuery()
             ;
@@ -258,14 +258,14 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
 
         protected function applyFrom()
         {
-            $this->getQueryBuilder()
+            $this->queryBuilder
                 ->from('My\Model\Entity\Product', $this->releaseAlias)
             ;
         }
 
         public function reset()
         {
-            $this->getQueryBuilder()
+            $this->queryBuilder
                 ->resetDQLParts()
                 ->setParameters(new ArrayCollection())
             ;
@@ -275,7 +275,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
         {
             foreach($this->getSorting()->getColumns() as $column => $order)
             {
-                $this->getQueryBuilder()->addOrderBy($column, $order);
+                $this->queryBuilder->addOrderBy($column, $order);
             }
         }
 
@@ -290,11 +290,11 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
                     continue;
                 }
 
-                $this->getQueryBuilder()->andWhere($condition->getClause());
+                $this->queryBuilder->andWhere($condition->getClause());
 
                 foreach($condition->getParams() as $name => $value)
                 {
-                    $this->getQueryBuilder()->setParameter($name, $value, $condition->getType($name));
+                    $this->queryBuilder->setParameter($name, $value, $condition->getType($name));
                 }
             }
         }
@@ -315,18 +315,18 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     $sortingDefaults = new SortingParams('title', 'asc');
 
     // the query
-    $queryBuilder = new ReleaseQueryBuilder($em);
+    $queryConfigurator = new ReleaseQueryConfigurator($em);
 
-    $queryBuilder
+    $queryConfigurator
         ->activateCondition('published')
         ->activateCondition('artist', array('artist' => $artist))
     ;
 
-    $queryBuilder->getSorting()->setParams($sortingParams);
-    $queryBuilder->getSorting()->setDefaults($sortingDefaults);
+    $queryConfigurator->getSorting()->setParams($sortingParams);
+    $queryConfigurator->getSorting()->setDefaults($sortingDefaults);
 
-    $count = $queryBuilder->getCountQuery()->getSingleResult();
-    $releases = $queryBuilder->getQuery()->getResult();
+    $count = $queryConfigurator->getCountQuery()->getSingleResult();
+    $releases = $queryConfigurator->getQuery()->getResult();
 
 ## License
 
