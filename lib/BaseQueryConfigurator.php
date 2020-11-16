@@ -21,8 +21,8 @@ use Sirprize\Queried\Sorting\Sorting;
 
 class BaseQueryConfigurator
 {
-    protected $registeredConditions = array();
-    protected $activeConditions = array();
+    protected $registeredConditions = [];
+    protected $activeConditions = [];
     protected $tokenizer = null;
     protected $sorting = null;
 
@@ -52,7 +52,7 @@ class BaseQueryConfigurator
         return $this;
     }
 
-    public function activateCondition($name, array $values = array())
+    public function activateCondition($name, array $values = [])
     {
         if (!$this->hasCondition($name))
         {

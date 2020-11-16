@@ -13,7 +13,7 @@ namespace Sirprize\Queried\Condition;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class Tokenizer
 {
     protected $prefix = null;
@@ -23,7 +23,7 @@ class Tokenizer
     {
         $this->prefix = (string) (!$prefix) ? 'token' : $prefix;
     }
-    
+
     public function make()
     {
         return $this->prefix.$this->count++;

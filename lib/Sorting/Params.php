@@ -5,7 +5,7 @@
  *
  * (c) Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 namespace Sirprize\Queried\Sorting;
 
 /**

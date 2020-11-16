@@ -13,7 +13,7 @@ namespace Sirprize\Queried\Condition;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 interface ConditionInterface
 {
     public function getClause();

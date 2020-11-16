@@ -13,19 +13,19 @@ namespace Sirprize\Queried\Condition;
  *
  * @author Christian Hoegl <chrigu@sirprize.me>
  */
- 
+
 class BaseCondition implements ConditionInterface
 {
     protected $clause = '';
-    protected $params = array();
-    protected $types = array();
-    protected $values = array();
+    protected $params = [];
+    protected $types = [];
+    protected $values = [];
 
     public function reset()
     {
         $this->clause = '';
-        $this->params = array();
-        $this->types = array();
+        $this->params = [];
+        $this->types = [];
     }
 
     public function setClause($clause)
@@ -87,7 +87,7 @@ class BaseCondition implements ConditionInterface
         {
             return null;
         }
-        
+
         return $this->types[$name];
     }
 
@@ -116,14 +116,14 @@ class BaseCondition implements ConditionInterface
     {
         return $this->values;
     }
-    
+
     protected function getValue($name)
     {
         if (!array_key_exists($name, $this->values))
         {
             return null;
         }
-        
+
         return $this->values[$name];
     }
 }
