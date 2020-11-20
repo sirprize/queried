@@ -317,7 +317,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
     // the query
     $queryConfigurator = new ReleaseQueryConfigurator($em);
 
-    $queryConfigurator
+    $queryConfigurator->getConditionRegistry()
         ->activateCondition('published')
         ->activateCondition('artist', array('artist' => $artist))
     ;
