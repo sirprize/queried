@@ -26,7 +26,7 @@ First we'll take a look at organizing conditions for the `WHERE` and `HAVING` pa
 
     $queryConfigurator = new BaseQueryConfigurator();
 
-    $queryConfigurator
+    $queryConfigurator->getConditionRegistry()
         ->registerCondition('published', $publishedCondition)
         ->registerCondition('physical', $physicalCondition)
         ->registerCondition('digital', $physicalCondition)
@@ -34,7 +34,7 @@ First we'll take a look at organizing conditions for the `WHERE` and `HAVING` pa
 
 Next we'll activate some of the conditions according application requirements. Only published releases with a release-date of today or older must make it into the result:
 
-    $queryConfigurator->activateCondition('published');
+    $queryConfigurator->getConditionRegistry()->activateCondition('published');
 
 Then the user can choose from digital or physical releases by setting the `format` parameter (eg `/releases?format=digital`)
 
@@ -42,15 +42,15 @@ Then the user can choose from digital or physical releases by setting the `forma
 
     if ($format === 'digital')
     {
-        $queryConfigurator->activateCondition('digital');
+        $queryConfigurator->getConditionRegistry()->activateCondition('digital');
     }
     else {
-        $queryConfigurator->activateCondition('physical');
+        $queryConfigurator->getConditionRegistry()->activateCondition('physical');
     }
 
 And finally we'll collect the activated conditions and add them to our query statement:
 
-    foreach($queryConfigurator->getActiveConditions() as $condition)
+    foreach ($queryConfigurator->getActiveConditions() as $condition)
     {
         $clause = $condition->getClause();
         // Add clause to query
@@ -210,12 +210,12 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
             $this->queryBuilder = $entityManager->createQueryBuilder();
 
             // register the external condition we built earlier
-            $this->registerCondition('artist', new ArtistCondition($this->releaseAlias));
+            $this->getConditionRegistry()->registerCondition('artist', new ArtistCondition($this->releaseAlias));
 
             // register an inline condition
             $pc = new BaseCondition();
             $pc->setClause("({$this->releaseAlias}.date <= CURRENT_DATE() AND {$this->releaseAlias}.published = 1)");
-            $this->registerCondition('published', $pc);
+            $this->getConditionRegistry()->registerCondition('published', $pc);
             
             // define some sorting rules
             $this->getSorting()->getRules()->newRule('title')
@@ -273,7 +273,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
 
         public function applySorting()
         {
-            foreach($this->getSorting()->getColumns() as $column => $order)
+            foreach ($this->getSorting()->getColumns() as $column => $order)
             {
                 $this->queryBuilder->addOrderBy($column, $order);
             }
@@ -281,7 +281,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
 
         protected function applyConditions()
         {
-            foreach($this->getActiveConditions() as $condition)
+            foreach ($this->getConditionRegistry()->getActiveConditions() as $condition)
             {
                 $condition->build($this->getTokenizer());
 
@@ -292,7 +292,7 @@ It's best to manage the construction of the entire query in a subclass of `BaseQ
 
                 $this->queryBuilder->andWhere($condition->getClause());
 
-                foreach($condition->getParams() as $name => $value)
+                foreach ($condition->getParams() as $name => $value)
                 {
                     $this->queryBuilder->setParameter($name, $value, $condition->getType($name));
                 }

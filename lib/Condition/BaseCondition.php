@@ -21,6 +21,13 @@ class BaseCondition implements ConditionInterface
     protected $types = [];
     protected $values = [];
 
+    public function __clone()
+    {
+        $this->values = [];
+
+        $this->reset();
+    }
+
     public function reset()
     {
         $this->clause = '';

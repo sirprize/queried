@@ -8,8 +8,9 @@
 
 namespace Sirprize\Queried;
 
-use Sirprize\Queried\Exception\InvalidArgumentException;
+#use Sirprize\Queried\Exception\InvalidArgumentException;
 use Sirprize\Queried\Condition\ConditionInterface;
+use Sirprize\Queried\Condition\Registry;
 use Sirprize\Queried\Condition\Tokenizer;
 use Sirprize\Queried\Sorting\Sorting;
 
@@ -21,57 +22,23 @@ use Sirprize\Queried\Sorting\Sorting;
 
 class BaseQueryConfigurator
 {
-    protected $registeredConditions = [];
-    protected $activeConditions = [];
+    protected $conditionRegistry = null;
     protected $tokenizer = null;
     protected $sorting = null;
 
-    public function registerConditions(array $conditions)
+    public function setConditionRegistry(Registry $conditionRegistry)
     {
-        foreach ($conditions as $name => $condition)
+        $this->conditionRegistry = $conditionRegistry;
+    }
+
+    public function getConditionRegistry()
+    {
+        if (!$this->conditionRegistry)
         {
-            $this->registerCondition($name, $condition);
+            $this->conditionRegistry = new Registry();
         }
 
-        return $this;
-    }
-
-    public function registerCondition($name, ConditionInterface $condition)
-    {
-        $this->registeredConditions[$name] = $condition;
-        return $this;
-    }
-
-    public function activateConditions(array $conditions)
-    {
-        foreach ($conditions as $name => $values)
-        {
-            $this->activateCondition($name, $values);
-        }
-
-        return $this;
-    }
-
-    public function activateCondition($name, array $values = [])
-    {
-        if (!$this->hasCondition($name))
-        {
-            throw new InvalidArgumentException(sprintf('No condition registered for key: "%s"', $name));
-        }
-
-        $this->activeConditions[$name] = $this->registeredConditions[$name]->setValues($values);
-
-        return $this;
-    }
-
-    public function hasCondition($name)
-    {
-        return array_key_exists($name, $this->registeredConditions) || array_key_exists($name, $this->activeConditions);
-    }
-
-    public function hasActiveCondition($name)
-    {
-        return array_key_exists($name, $this->activeConditions);
+        return $this->conditionRegistry;
     }
 
     public function getSorting()
@@ -84,21 +51,6 @@ class BaseQueryConfigurator
         return $this->sorting;
     }
 
-    public function getActiveConditions()
-    {
-        return $this->activeConditions;
-    }
-
-    protected function getActiveCondition($name)
-    {
-        if (!$this->hasActiveCondition($name))
-        {
-            throw new InvalidArgumentException(sprintf('No active condition for key: "%s"', $name));
-        }
-
-        return $this->activeConditions[$name];
-    }
-
     protected function getTokenizer()
     {
         if (!$this->tokenizer)
@@ -108,4 +60,60 @@ class BaseQueryConfigurator
 
         return $this->tokenizer;
     }
+
+    // @deprecated
+    /*public function registerConditions(array $conditions)
+    {
+        $this->getConditionRegistry()->registerConditions($conditions);
+
+        return $this;
+    }
+
+    // @deprecated
+    public function registerCondition($name, ConditionInterface $condition)
+    {
+        $this->getConditionRegistry()->registerCondition($name, $condition);
+
+        return $this;
+    }
+
+    // @deprecated
+    public function activateConditions(array $conditions)
+    {
+        $this->getConditionRegistry()->activateConditions($conditions);
+
+        return $this;
+    }
+
+    // @deprecated
+    public function activateCondition($name, array $values = [])
+    {
+        $this->getConditionRegistry()->activateCondition($name, $values);
+
+        return $this;
+    }
+
+    // @deprecated
+    public function hasCondition($name)
+    {
+        return $this->getConditionRegistry()->hasCondition($name);
+    }
+
+    // @deprecated
+    public function hasActiveCondition($name)
+    {
+        return $this->getConditionRegistry()->hasActiveCondition($name);
+    }
+
+    // @deprecated
+    public function getActiveConditions()
+    {
+        return $this->getConditionRegistry()->getActiveConditions();
+    }
+
+    // @deprecated
+    protected function getActiveCondition($name)
+    {
+        return $this->getConditionRegistry()->getActiveCondition($name);
+    }*/
 }
