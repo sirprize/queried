@@ -8,7 +8,6 @@
 
 namespace Sirprize\Queried;
 
-#use Sirprize\Queried\Exception\InvalidArgumentException;
 use Sirprize\Queried\Condition\ConditionInterface;
 use Sirprize\Queried\Condition\Registry;
 use Sirprize\Queried\Condition\Tokenizer;
@@ -60,60 +59,4 @@ class BaseQueryConfigurator
 
         return $this->tokenizer;
     }
-
-    // @deprecated
-    /*public function registerConditions(array $conditions)
-    {
-        $this->getConditionRegistry()->registerConditions($conditions);
-
-        return $this;
-    }
-
-    // @deprecated
-    public function registerCondition($name, ConditionInterface $condition)
-    {
-        $this->getConditionRegistry()->registerCondition($name, $condition);
-
-        return $this;
-    }
-
-    // @deprecated
-    public function activateConditions(array $conditions)
-    {
-        $this->getConditionRegistry()->activateConditions($conditions);
-
-        return $this;
-    }
-
-    // @deprecated
-    public function activateCondition($name, array $values = [])
-    {
-        $this->getConditionRegistry()->activateCondition($name, $values);
-
-        return $this;
-    }
-
-    // @deprecated
-    public function hasCondition($name)
-    {
-        return $this->getConditionRegistry()->hasCondition($name);
-    }
-
-    // @deprecated
-    public function hasActiveCondition($name)
-    {
-        return $this->getConditionRegistry()->hasActiveCondition($name);
-    }
-
-    // @deprecated
-    public function getActiveConditions()
-    {
-        return $this->getConditionRegistry()->getActiveConditions();
-    }
-
-    // @deprecated
-    protected function getActiveCondition($name)
-    {
-        return $this->getConditionRegistry()->getActiveCondition($name);
-    }*/
 }
