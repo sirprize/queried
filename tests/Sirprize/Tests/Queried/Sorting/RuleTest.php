@@ -9,8 +9,9 @@
 namespace Sirprize\Tests\Queried\Sorting;
 
 use Sirprize\Queried\Sorting\Rule;
+use PHPUnit\Framework\TestCase;
 
-class RuleTest extends \PHPUnit_Framework_TestCase
+class RuleTest extends TestCase
 {
     public function testSetters()
     {

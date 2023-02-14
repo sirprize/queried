@@ -9,18 +9,19 @@
 namespace Sirprize\Tests\Queried\Sorting;
 
 use Sirprize\Queried\Sorting\Rules;
+use PHPUnit\Framework\TestCase;
 
-class RulesTest extends \PHPUnit_Framework_TestCase
+class RulesTest extends TestCase
 {
     protected $rules = null;
 
-    public function setup()
+    protected function setup(): void
     {
         $this->rules = new Rules();
         $this->rules->newRule('title');
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->rules = null;
     }

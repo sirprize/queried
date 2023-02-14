@@ -9,8 +9,9 @@
 namespace Sirprize\Tests\Queried\Condition;
 
 use Sirprize\Queried\Condition\Tokenizer;
+use PHPUnit\Framework\TestCase;
 
-class TokenizerTest extends \PHPUnit_Framework_TestCase
+class TokenizerTest extends TestCase
 {
     public function testTokenizer()
     {

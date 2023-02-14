@@ -10,17 +10,18 @@ namespace Sirprize\Tests\Queried;
 
 use Sirprize\Queried\Condition\Registry;
 use Sirprize\Queried\Condition\BaseCondition;
+use PHPUnit\Framework\TestCase;
 
-class RegistryTest extends \PHPUnit_Framework_TestCase
+class RegistryTest extends TestCase
 {
     protected $registry = null;
 
-    public function setup()
+    protected function setup(): void
     {
         $this->registry = new Registry();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->registry = null;
     }
@@ -39,11 +40,10 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->registry->hasActiveCondition('someCondition'));
     }
 
-    /**
-     * @expectedException Sirprize\Queried\Exception\InvalidArgumentException
-     */
     public function testActivateNonExistingCondition()
     {
+        $this->expectException(\Sirprize\Queried\Exception\InvalidArgumentException::class);
+
         $this->registry->activateCondition('asdfdsf');
     }
 }

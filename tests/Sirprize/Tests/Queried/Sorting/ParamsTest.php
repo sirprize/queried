@@ -9,8 +9,9 @@
 namespace Sirprize\Tests\Queried\Sorting;
 
 use Sirprize\Queried\Sorting\Params;
+use PHPUnit\Framework\TestCase;
 
-class ParamsTest extends \PHPUnit_Framework_TestCase
+class ParamsTest extends TestCase
 {
     public function testSet()
     {

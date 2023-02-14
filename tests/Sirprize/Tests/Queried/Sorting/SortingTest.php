@@ -11,12 +11,13 @@ namespace Sirprize\Tests\Queried\Sorting;
 use Sirprize\Queried\Sorting\Rules;
 use Sirprize\Queried\Sorting\Params;
 use Sirprize\Queried\Sorting\Sorting;
+use PHPUnit\Framework\TestCase;
 
-class SortingTest extends \PHPUnit_Framework_TestCase
+class SortingTest extends TestCase
 {
     protected $rules = null;
 
-    public function setup()
+    protected function setup(): void
     {
         $this->rules = new Rules();
         
@@ -33,7 +34,7 @@ class SortingTest extends \PHPUnit_Framework_TestCase
         ;
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->rules = null;
     }

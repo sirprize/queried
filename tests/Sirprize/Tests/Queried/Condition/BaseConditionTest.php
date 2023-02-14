@@ -10,8 +10,9 @@ namespace Sirprize\Tests\Queried\Condition;
 
 use Sirprize\Queried\Condition\BaseCondition;
 use Sirprize\Queried\Condition\Tokenizer;
+use PHPUnit\Framework\TestCase;
 
-class BaseConditionTest extends \PHPUnit_Framework_TestCase
+class BaseConditionTest extends TestCase
 {
     public function testSetGetCondition()
     {
