@@ -98,7 +98,7 @@ class BaseCondition implements ConditionInterface
         return $this->types[$name];
     }
 
-    public function build(Tokenizer $tokenizer = null)
+    public function build(?Tokenizer $tokenizer = null)
     {
         return $this;
     }

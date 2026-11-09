@@ -19,5 +19,5 @@ interface ConditionInterface
     public function getClause();
     public function getParams();
     public function getTypes();
-    public function build(Tokenizer $tokenizer = null);
+    public function build(?Tokenizer $tokenizer = null);
 }
